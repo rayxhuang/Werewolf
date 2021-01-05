@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">狼人杀法官</string>
+    <string name="start_button">开始游戏</string>
+    <string name="settings_button">更改设置</string>
+    <string name="werewolf_text">Werewolf</string>
+    <string name="character_description_wolf">狼人</string>
+    <string name="character_description_villager">村民</string>
+    <string name="character_description_seer">预言家</string>
+    <string name="character_description_witcher">女巫</string>
+    <string name="character_description_guardian">守卫</string>
+    <string name="character_description_idoit">白痴</string>
+    <string name="title_activity_player_info">狼人杀</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="title_activity_game">当前游戏</string>
+    <string name="startGameLabel">开始游戏</string>
+    <string name="gameTitle">玩家</string>
+    <string name="skipTextLabel">跳过</string>
+    <string name="title_assign_character">请查看身份</string>
+    <string name="killTextLabel">请选择你要猎杀的玩家</string>
+    <string name="guardTextLabel">请选择你要守护的玩家</string>
+    <string name="actionTextLabel">请选择你要操作的玩家</string>
+    <string name="seerTextLabel">请选择你要查看的玩家</string>
+    <string name="id1">1</string>
+    <string name="id2">2</string>
+    <string name="id3">3</string>
+    <string name="id4">4</string>
+    <string name="id5">5</string>
+    <string name="id6">6</string>
+    <string name="id7">7</string>
+    <string name="id8">8</string>
+    <string name="id9">9</string>
+    <string name="id10">10</string>
+    <string name="id11">11</string>
+    <string name="id12">12</string>
+    <string name="confirmButtonLabel">确认</string>
+    <string name="witcherSaveButtonTextLabel">使用解药</string>
+    <string name="witcherKillButtonTextLabel">使用毒药</string>
+</resources>
