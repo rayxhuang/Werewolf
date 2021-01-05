@@ -8,99 +8,95 @@
     tools:context=".Day">
 
     <TextView
-        android:id="@+id/actionLabel"
+        android:id="@+id/actionLabel1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:clickable="false"
         android:textColor="#FFFFFF"
-        android:textSize="36sp"
+        android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.046" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/pCard1"
-        android:contentDescription="@string/id1"
+        android:id="@+id/p1Card1"
         android:layout_width="80dp"
         android:layout_height="120dp"
         android:layout_row="0"
         android:layout_column="0"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="36dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
-        android:focusable="true"
+        android:contentDescription="@string/id1"
         android:duplicateParentState="true"
+        android:focusable="true"
         android:src="@drawable/card_back1"
-        app:layout_constraintBottom_toTopOf="@+id/pCard5"
-        app:layout_constraintEnd_toStartOf="@+id/pCard2"
+        app:layout_constraintBottom_toTopOf="@+id/p1Card5"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/actionLabel" />
+        app:layout_constraintTop_toBottomOf="@+id/actionLabel2" />
 
     <ImageView
-        android:id="@+id/pCard2"
-        android:contentDescription="@string/id2"
+        android:id="@+id/p1Card2"
         android:layout_width="80dp"
         android:layout_height="120dp"
         android:layout_row="0"
         android:layout_column="1"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="36dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
+        android:contentDescription="@string/id2"
         android:focusable="true"
         android:src="@drawable/card_back2"
-        app:layout_constraintBottom_toTopOf="@+id/pCard6"
-        app:layout_constraintEnd_toStartOf="@+id/pCard3"
-        app:layout_constraintStart_toEndOf="@+id/pCard1"
-        app:layout_constraintTop_toBottomOf="@+id/actionLabel" />
+        app:layout_constraintBottom_toTopOf="@+id/p1Card6"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card3"
+        app:layout_constraintStart_toEndOf="@+id/p1Card1"
+        app:layout_constraintTop_toBottomOf="@+id/actionLabel2" />
 
     <ImageView
-        android:id="@+id/pCard3"
-        android:contentDescription="@string/id3"
+        android:id="@+id/p1Card3"
         android:layout_width="80dp"
         android:layout_height="120dp"
         android:layout_row="0"
         android:layout_column="2"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="36dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
+        android:contentDescription="@string/id3"
         android:focusable="true"
         android:src="@drawable/card_back3"
-        app:layout_constraintBottom_toTopOf="@+id/pCard7"
-        app:layout_constraintEnd_toStartOf="@+id/pCard4"
-        app:layout_constraintStart_toEndOf="@+id/pCard2"
-        app:layout_constraintTop_toBottomOf="@+id/actionLabel" />
+        app:layout_constraintBottom_toTopOf="@+id/p1Card7"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card4"
+        app:layout_constraintStart_toEndOf="@+id/p1Card2"
+        app:layout_constraintTop_toBottomOf="@+id/actionLabel2" />
 
     <ImageView
-        android:id="@+id/pCard4"
-        android:contentDescription="@string/id4"
+        android:id="@+id/p1Card4"
         android:layout_width="80dp"
         android:layout_height="120dp"
         android:layout_row="0"
         android:layout_column="3"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="36dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
+        android:contentDescription="@string/id4"
         android:focusable="true"
         android:src="@drawable/card_back4"
-        app:layout_constraintBottom_toTopOf="@+id/pCard8"
+        app:layout_constraintBottom_toTopOf="@+id/p1Card8"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/pCard3"
-        app:layout_constraintTop_toBottomOf="@+id/actionLabel" />
+        app:layout_constraintStart_toEndOf="@+id/p1Card3"
+        app:layout_constraintTop_toBottomOf="@+id/actionLabel2" />
 
     <ImageView
-        android:id="@+id/pCard5"
+        android:id="@+id/p1Card5"
         android:contentDescription="@string/id5"
         android:layout_width="80dp"
         android:layout_height="120dp"
@@ -113,13 +109,13 @@
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/card_back5"
-        app:layout_constraintBottom_toTopOf="@+id/pCard9"
-        app:layout_constraintEnd_toStartOf="@+id/pCard6"
+        app:layout_constraintBottom_toTopOf="@+id/p1Card9"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card6"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pCard1" />
+        app:layout_constraintTop_toBottomOf="@+id/p1Card1" />
 
     <ImageView
-        android:id="@+id/pCard6"
+        android:id="@+id/p1Card6"
         android:contentDescription="@string/id6"
         android:layout_width="80dp"
         android:layout_height="120dp"
@@ -132,13 +128,13 @@
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/card_back6"
-        app:layout_constraintBottom_toTopOf="@+id/pCard10"
-        app:layout_constraintEnd_toStartOf="@+id/pCard7"
-        app:layout_constraintStart_toEndOf="@+id/pCard5"
-        app:layout_constraintTop_toBottomOf="@+id/pCard2" />
+        app:layout_constraintBottom_toTopOf="@+id/p1Card10"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card7"
+        app:layout_constraintStart_toEndOf="@+id/p1Card5"
+        app:layout_constraintTop_toBottomOf="@+id/p1Card2" />
 
     <ImageView
-        android:id="@+id/pCard7"
+        android:id="@+id/p1Card7"
         android:contentDescription="@string/id7"
         android:layout_width="80dp"
         android:layout_height="120dp"
@@ -151,13 +147,13 @@
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/card_back7"
-        app:layout_constraintBottom_toTopOf="@+id/pCard11"
-        app:layout_constraintEnd_toStartOf="@+id/pCard8"
-        app:layout_constraintStart_toEndOf="@+id/pCard6"
-        app:layout_constraintTop_toBottomOf="@+id/pCard3" />
+        app:layout_constraintBottom_toTopOf="@+id/p1Card11"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card8"
+        app:layout_constraintStart_toEndOf="@+id/p1Card6"
+        app:layout_constraintTop_toBottomOf="@+id/p1Card3" />
 
     <ImageView
-        android:id="@+id/pCard8"
+        android:id="@+id/p1Card8"
         android:contentDescription="@string/id8"
         android:layout_width="80dp"
         android:layout_height="120dp"
@@ -170,13 +166,13 @@
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/card_back8"
-        app:layout_constraintBottom_toTopOf="@+id/pCard12"
+        app:layout_constraintBottom_toTopOf="@+id/p1Card12"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/pCard7"
-        app:layout_constraintTop_toBottomOf="@+id/pCard4" />
+        app:layout_constraintStart_toEndOf="@+id/p1Card7"
+        app:layout_constraintTop_toBottomOf="@+id/p1Card4" />
 
     <ImageView
-        android:id="@+id/pCard9"
+        android:id="@+id/p1Card9"
         android:layout_width="80dp"
         android:layout_height="120dp"
         android:layout_row="2"
@@ -188,13 +184,13 @@
         android:contentDescription="@string/id9"
         android:focusable="true"
         android:src="@drawable/card_back9"
-        app:layout_constraintBottom_toTopOf="@+id/confirmButton"
-        app:layout_constraintEnd_toStartOf="@+id/pCard10"
+        app:layout_constraintBottom_toTopOf="@+id/confirmButton1"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card10"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pCard5" />
+        app:layout_constraintTop_toBottomOf="@+id/p1Card5" />
 
     <ImageView
-        android:id="@+id/pCard10"
+        android:id="@+id/p1Card10"
         android:layout_width="80dp"
         android:layout_height="120dp"
         android:layout_row="2"
@@ -206,13 +202,13 @@
         android:contentDescription="@string/id10"
         android:focusable="true"
         android:src="@drawable/card_back10"
-        app:layout_constraintBottom_toTopOf="@+id/confirmButton"
-        app:layout_constraintEnd_toStartOf="@+id/pCard11"
-        app:layout_constraintStart_toEndOf="@+id/pCard9"
-        app:layout_constraintTop_toBottomOf="@+id/pCard6" />
+        app:layout_constraintBottom_toTopOf="@+id/confirmButton1"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card11"
+        app:layout_constraintStart_toEndOf="@+id/p1Card9"
+        app:layout_constraintTop_toBottomOf="@+id/p1Card6" />
 
     <ImageView
-        android:id="@+id/pCard11"
+        android:id="@+id/p1Card11"
         android:layout_width="80dp"
         android:layout_height="120dp"
         android:layout_row="2"
@@ -224,13 +220,13 @@
         android:contentDescription="@string/id11"
         android:focusable="true"
         android:src="@drawable/card_back11"
-        app:layout_constraintBottom_toTopOf="@+id/confirmButton"
-        app:layout_constraintEnd_toStartOf="@+id/pCard12"
-        app:layout_constraintStart_toEndOf="@+id/pCard10"
-        app:layout_constraintTop_toBottomOf="@+id/pCard7" />
+        app:layout_constraintBottom_toTopOf="@+id/confirmButton1"
+        app:layout_constraintEnd_toStartOf="@+id/p1Card12"
+        app:layout_constraintStart_toEndOf="@+id/p1Card10"
+        app:layout_constraintTop_toBottomOf="@+id/p1Card7" />
 
     <ImageView
-        android:id="@+id/pCard12"
+        android:id="@+id/p1Card12"
         android:layout_width="80dp"
         android:layout_height="120dp"
         android:layout_row="2"
@@ -242,13 +238,13 @@
         android:contentDescription="@string/id12"
         android:focusable="true"
         android:src="@drawable/card_back12"
-        app:layout_constraintBottom_toTopOf="@+id/confirmButton"
+        app:layout_constraintBottom_toTopOf="@+id/confirmButton1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/pCard11"
-        app:layout_constraintTop_toBottomOf="@+id/pCard8" />
+        app:layout_constraintStart_toEndOf="@+id/p1Card11"
+        app:layout_constraintTop_toBottomOf="@+id/p1Card8" />
 
     <Button
-        android:id="@+id/confirmButton"
+        android:id="@+id/confirmButton1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="68dp"
@@ -256,5 +252,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/actionLabel2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/actionLabel1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

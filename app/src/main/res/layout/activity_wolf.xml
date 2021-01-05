@@ -189,7 +189,7 @@
         android:contentDescription="@string/id9"
         android:focusable="true"
         android:src="@drawable/card_back9"
-        app:layout_constraintBottom_toTopOf="@+id/saveButton"
+        app:layout_constraintBottom_toTopOf="@+id/confirmButton"
         app:layout_constraintEnd_toStartOf="@+id/pCard10"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pCard5" />
@@ -208,7 +208,7 @@
         android:contentDescription="@string/id10"
         android:focusable="true"
         android:src="@drawable/card_back10"
-        app:layout_constraintBottom_toTopOf="@+id/saveButton"
+        app:layout_constraintBottom_toTopOf="@+id/confirmButton"
         app:layout_constraintEnd_toStartOf="@+id/pCard11"
         app:layout_constraintStart_toEndOf="@+id/pCard9"
         app:layout_constraintTop_toBottomOf="@+id/pCard6" />
@@ -227,7 +227,7 @@
         android:contentDescription="@string/id11"
         android:focusable="true"
         android:src="@drawable/card_back11"
-        app:layout_constraintBottom_toTopOf="@+id/killButton"
+        app:layout_constraintBottom_toTopOf="@+id/confirmButton"
         app:layout_constraintEnd_toStartOf="@+id/pCard12"
         app:layout_constraintStart_toEndOf="@+id/pCard10"
         app:layout_constraintTop_toBottomOf="@+id/pCard7" />
@@ -246,7 +246,7 @@
         android:contentDescription="@string/id12"
         android:focusable="true"
         android:src="@drawable/card_back12"
-        app:layout_constraintBottom_toTopOf="@+id/killButton"
+        app:layout_constraintBottom_toTopOf="@+id/confirmButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/pCard11"
         app:layout_constraintTop_toBottomOf="@+id/pCard8" />

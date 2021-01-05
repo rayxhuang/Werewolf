@@ -251,22 +251,7 @@ public class Wolf extends AppCompatActivity {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mp.release();
-                        Toast.makeText(Wolf.this, "天亮了...", Toast.LENGTH_SHORT).show();
-//                        Intent day = new Intent(Wolf.this, Wolf.class);
-//                        day.putExtra("id", playerID);
-//                        day.putExtra("characters", assignedCharacterList);
-//                        day.putExtra("alive",alive);
-//                        day.putExtra("numPlayer", numPlayers);
-//                        day.putExtra("guardedPlayerID", guardedPlayerID);
-//                        day.putExtra("intentKillPlayerID", intentKillPlayerID);
-//                        day.putExtra("antidotePlayerID", antidotePlayerID);
-//                        day.putExtra("poisonPlayerID", poisonPlayerID);
-//                        startActivity(day);
-                        Intent game = new Intent(Wolf.this, Game.class);
-                        game.putExtra("id", playerID);
-                        game.putExtra("characters", assignedCharacterList);
-                        startActivity(game);
+                        finishNight();
                     }
                 }, 12000);
             }
@@ -277,7 +262,7 @@ public class Wolf extends AppCompatActivity {
     private MediaPlayer.OnCompletionListener prepareForNext = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            Toast.makeText(Wolf.this, "Audi playback finished, this is auto stop", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(Wolf.this, "Audi playback finished, this is auto stop", Toast.LENGTH_SHORT).show();
             mp.stop();
             mp.reset();
         }
@@ -716,7 +701,6 @@ public class Wolf extends AppCompatActivity {
                 mp.setOnCompletionListener(prepareForNext);
                 mp.start();
                 hideWolf();
-                confirmButton.setVisibility(View.VISIBLE);
                 confirmButton.setEnabled(false);
                 witcherSaveButton.setVisibility(View.GONE);
                 witcherKillButton.setVisibility(View.GONE);
@@ -726,11 +710,26 @@ public class Wolf extends AppCompatActivity {
         }, 2000);
 
         //Setup next
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        }, 12000);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finishNight();
+            }
+        }, 12000);
+    }
+
+    private void finishNight(){
+        mp.release();
+        Toast.makeText(Wolf.this, "天亮了...", Toast.LENGTH_SHORT).show();
+        Intent day = new Intent(Wolf.this, Day.class);
+        day.putExtra("id", playerID);
+        day.putExtra("characters", assignedCharacterList);
+        day.putExtra("alive",alive);
+        day.putExtra("numPlayers", numPlayers);
+        day.putExtra("guardedPlayerID", guardedPlayerID);
+        day.putExtra("intentKillPlayerID", intentKillPlayerID);
+        day.putExtra("antidotePlayerID", antidotePlayerID);
+        day.putExtra("poisonPlayerID", poisonPlayerID);
+        startActivity(day);
     }
 }

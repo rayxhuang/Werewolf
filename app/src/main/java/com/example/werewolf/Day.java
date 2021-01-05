@@ -14,7 +14,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class Day extends AppCompatActivity {
-    private Integer deathID = 0;
+    private Integer deathID1 = 0;
+    private Integer deathID2 = 0;
 
     private ArrayList<Integer> playerID;
     private ArrayList<String> assignedCharacterList;
@@ -25,11 +26,12 @@ public class Day extends AppCompatActivity {
     private Integer currentSelectedPlayerID = 0;
     private Integer guardedPlayerID = 0;
     private Integer intentKillPlayerID = 0;
-    private Boolean witcherHoldsAntidote = false;
-    private Boolean witcherHoldsPoison = false;
+//    private Boolean witcherHoldsAntidote = false;
+//    private Boolean witcherHoldsPoison = false;
     private Integer antidotePlayerID = 0;
     private Integer poisonPlayerID = 0;
     private TextView actionLabel;
+    private TextView actionLabel2;
     private Button confirmButton;
     private ImageView p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
 
@@ -38,7 +40,6 @@ public class Day extends AppCompatActivity {
     private MediaPlayer.OnCompletionListener prepareForNext = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            Toast.makeText(Day.this, "Audi playback finished, this is auto stop", Toast.LENGTH_SHORT).show();
             mp.stop();
             mp.reset();
         }
@@ -65,73 +66,67 @@ public class Day extends AppCompatActivity {
         if (extras != null) {
             playerID = (ArrayList<Integer>) getIntent().getSerializableExtra("id");
             assignedCharacterList = (ArrayList<String>) getIntent().getSerializableExtra("characters");
-            numPlayers = (Integer) extras.get("numPlayers");
             alive = (ArrayList<Boolean>) getIntent().getSerializableExtra("alive");
+            numPlayers = (Integer) extras.get("numPlayers");
             guardedPlayerID = (Integer) extras.get("guardedPlayerID");
             intentKillPlayerID = (Integer) extras.get("intentKillPlayerID");
             antidotePlayerID = (Integer) extras.get("antidotePlayerID");
             poisonPlayerID = (Integer) extras.get("poisonPlayerID");
         }
-        //Judge death(s)
-//        if (intentKillPlayerID != 0) {
-//            if (antidotePlayerID == intentKillPlayerID){
-//                if (guardedPlayerID == intentKillPlayerID) {
-//                    deathID = intentKillPlayerID;
-//                }
-//            } else {
-//                if (guardedPlayerID != intentKillPlayerID) {
-//                    deathID = intentKillPlayerID;
-//                }
-//            }
-//        }
-//        alive.set(deathID - 1 , false);
-//        Toast.makeText(Day.this, "昨天晚上死亡的是" + deathID + "号玩家", Toast.LENGTH_SHORT).show();
-//
-//        init();
-//
-//        //Day starts...
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mp = MediaPlayer.create(Day.this, R.raw.audio_day_start);
-//                mp.setOnCompletionListener(prepareForNext);
-//                mp.start();
-//            }
-//        }, 2000);
+//        Toast.makeText(Day.this, "guardedPlayerID " + guardedPlayerID, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(Day.this, "intentKillPlayerID " + intentKillPlayerID, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(Day.this, "antidotePlayerID " + antidotePlayerID, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(Day.this, "poisonPlayerID " +poisonPlayerID, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(Day.this, "numPlayers " +numPlayers, Toast.LENGTH_SHORT).show();
+
+        init();
+
+        //Day starts...
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mp = MediaPlayer.create(Day.this, R.raw.audio_day_start);
+                mp.setOnCompletionListener(prepareForNext);
+                mp.start();
+                judgeDeath();
+            }
+        }, 3000);
     }
 
     private void init() {
-        actionLabel = findViewById(R.id.actionLabel);
+        actionLabel = findViewById(R.id.actionLabel1);
         actionLabel.setText("天亮了");
-        confirmButton = findViewById(R.id.confirmButton);
+        actionLabel2 = findViewById(R.id.actionLabel2);
+        confirmButton = findViewById(R.id.confirmButton1);
         confirmButton.setEnabled(false);
 
-        p1 = findViewById(R.id.pCard1);
-        p2 = findViewById(R.id.pCard2);
-        p3 = findViewById(R.id.pCard3);
-        p4 = findViewById(R.id.pCard4);
-        p5 = findViewById(R.id.pCard5);
-        p6 = findViewById(R.id.pCard6);
-        p7 = findViewById(R.id.pCard7);
-        p8 = findViewById(R.id.pCard8);
-        p9 = findViewById(R.id.pCard9);
-        p10 = findViewById(R.id.pCard10);
-        p11 = findViewById(R.id.pCard11);
-        p12 = findViewById(R.id.pCard12);
+        p1 = findViewById(R.id.p1Card1);
+        p2 = findViewById(R.id.p1Card2);
+        p3 = findViewById(R.id.p1Card3);
+        p4 = findViewById(R.id.p1Card4);
+        p5 = findViewById(R.id.p1Card5);
+        p6 = findViewById(R.id.p1Card6);
+        p7 = findViewById(R.id.p1Card7);
+        p8 = findViewById(R.id.p1Card8);
+        p9 = findViewById(R.id.p1Card9);
+        p10 = findViewById(R.id.p1Card10);
+        p11 = findViewById(R.id.p1Card11);
+        p12 = findViewById(R.id.p1Card12);
 
 
         for (int i = 0; i < 12; i++){
             if (assignedCharacterList.get(i).equals("None")){
                 makeTransparent(i);
             } else {
-                if (alive.get(i) == false) {
+                if (!alive.get(i)) {
                     updateDeadCard(i);
                 }
             }
         }
 
+        //this is only for adding onClickListeners
         for (int i = 1; i < 13; i++) {
-            switch (i){
+            switch (i) {
                 case 1:
                     p1.setOnClickListener(selectPlayer);
                     break;
@@ -146,49 +141,41 @@ public class Day extends AppCompatActivity {
                     break;
                 case 5:
                     if (i <= numPlayers) {
-                        p5.setVisibility(View.GONE);
                         p5.setOnClickListener(selectPlayer);
                     }
                     break;
                 case 6:
                     if (i <= numPlayers) {
-                        p6.setVisibility(View.GONE);
                         p6.setOnClickListener(selectPlayer);
                     }
                     break;
                 case 7:
                     if (i <= numPlayers) {
-                        p7.setVisibility(View.GONE);
                         p7.setOnClickListener(selectPlayer);
                     }
                     break;
                 case 8:
                     if (i <= numPlayers) {
-                        p8.setVisibility(View.GONE);
                         p8.setOnClickListener(selectPlayer);
                     }
                     break;
                 case 9:
                     if (i <= numPlayers) {
-                        p9.setVisibility(View.GONE);
                         p9.setOnClickListener(selectPlayer);
                     }
                     break;
                 case 10:
                     if (i <= numPlayers) {
-                        p10.setVisibility(View.GONE);
                         p10.setOnClickListener(selectPlayer);
                     }
                     break;
                 case 11:
                     if (i <= numPlayers) {
-                        p11.setVisibility(View.GONE);
                         p11.setOnClickListener(selectPlayer);
                     }
                     break;
                 case 12:
                     if (i <= numPlayers) {
-                        p12.setVisibility(View.GONE);
                         p12.setOnClickListener(selectPlayer);
                     }
                     break;
@@ -263,6 +250,50 @@ public class Day extends AppCompatActivity {
             case 11:
                 p12.setImageResource(R.drawable.card_back_dead);
                 break;
+        }
+    }
+
+    private void judgeDeath() {
+        //        Judge death(s)
+        if (intentKillPlayerID != 0) {
+            if (antidotePlayerID.equals(intentKillPlayerID)){
+                if (guardedPlayerID.equals(intentKillPlayerID)) {
+                    deathID1 = intentKillPlayerID;
+                    alive.set(deathID1 - 1 , false);
+                    updateDeadCard(deathID1 - 1);
+                }
+            } else {
+                if (!guardedPlayerID.equals(intentKillPlayerID)) {
+                    deathID1 = intentKillPlayerID;
+                    alive.set(deathID1 - 1 , false);
+                    updateDeadCard(deathID1 - 1);
+                }
+            }
+        }
+        if (poisonPlayerID != 0) {
+            deathID2 = poisonPlayerID;
+            alive.set(deathID2 - 1 , false);
+            updateDeadCard(deathID2 - 1);
+            int firstID = deathID1;
+            int secondID = deathID2;
+            int tempID = 0;
+            if (firstID > secondID) {
+                tempID = firstID;
+                firstID = secondID;
+                secondID = tempID;
+            }
+            Toast.makeText(Day.this, "昨天晚上死亡的是" + firstID + "号玩家和" + secondID + "号玩家", Toast.LENGTH_SHORT).show();
+            actionLabel.setText("昨天晚上死亡的是");
+            actionLabel2.setText(firstID + "号玩家和" + secondID + "号玩家");
+        } else {
+            if (deathID1 == 0) {
+                Toast.makeText(Day.this, "昨天晚上是平安夜", Toast.LENGTH_SHORT).show();
+                actionLabel.setText("昨天晚上是平安夜");
+            } else {
+                Toast.makeText(Day.this, "昨天晚上死亡的是" + deathID1 + "号玩家", Toast.LENGTH_SHORT).show();
+                actionLabel.setText("昨天晚上死亡的是");
+                actionLabel2.setText(deathID1 + "号玩家");
+            }
         }
     }
 }
