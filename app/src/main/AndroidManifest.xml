@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Werewolf">
-        <activity android:name=".Guardian"></activity>
+        <activity android:name=".Day" />
+        <activity android:name=".Guardian" />
         <activity android:name=".Wolf" />
         <activity android:name=".Game" />
         <activity android:name=".MainActivity">

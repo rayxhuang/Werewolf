@@ -1,5 +1,6 @@
 package com.example.werewolf;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -236,15 +237,40 @@ public class Wolf extends AppCompatActivity {
                 }
             }, 3000);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (assignedCharacterList.contains("witcher")){
-                        setupWitcher();
+            if (assignedCharacterList.contains("witcher")) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (assignedCharacterList.contains("witcher")){
+                            setupWitcher();
+                        }
+                        //
                     }
-                    //
-                }
-            }, 12000);
+                }, 12000);
+            } else {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mp.release();
+                        Toast.makeText(Wolf.this, "天亮了...", Toast.LENGTH_SHORT).show();
+//                        Intent day = new Intent(Wolf.this, Wolf.class);
+//                        day.putExtra("id", playerID);
+//                        day.putExtra("characters", assignedCharacterList);
+//                        day.putExtra("alive",alive);
+//                        day.putExtra("numPlayer", numPlayers);
+//                        day.putExtra("guardedPlayerID", guardedPlayerID);
+//                        day.putExtra("intentKillPlayerID", intentKillPlayerID);
+//                        day.putExtra("antidotePlayerID", antidotePlayerID);
+//                        day.putExtra("poisonPlayerID", poisonPlayerID);
+//                        startActivity(day);
+                        Intent game = new Intent(Wolf.this, Game.class);
+                        game.putExtra("id", playerID);
+                        game.putExtra("characters", assignedCharacterList);
+                        startActivity(game);
+                    }
+                }, 12000);
+            }
+
         }
     };
 
@@ -443,47 +469,6 @@ public class Wolf extends AppCompatActivity {
                 break;
             case 11:
                 p12.setImageResource(R.drawable.transparent);
-                break;
-        }
-    }
-
-    private void updateDeadCard(int i) {
-        switch (i) {
-            case 0:
-                p1.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 1:
-                p2.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 2:
-                p3.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 3:
-                p4.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 4:
-                p5.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 5:
-                p6.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 6:
-                p7.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 7:
-                p8.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 8:
-                p9.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 9:
-                p10.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 10:
-                p11.setImageResource(R.drawable.card_back_dead);
-                break;
-            case 11:
-                p12.setImageResource(R.drawable.card_back_dead);
                 break;
         }
     }
