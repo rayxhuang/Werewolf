@@ -16,20 +16,26 @@ import java.util.ArrayList;
 
 import static com.example.werewolf.R.string.killTextLabel;
 
-public class Wolf extends AppCompatActivity {
+public class Night extends AppCompatActivity {
+    private int wolf;
+    private int villagers;
+    private int seer;
+    private int witcher;
+    private int guardian;
+    private int idiot;
     private ArrayList<Integer> playerID;
     private ArrayList<String> assignedCharacterList;
-    private Integer numPlayers = 0;
+    private Integer numPlayers;
     private ArrayList<Boolean> alive;
     private String currentCharacter = "None";
     private Integer selectedPlayerID = 0;
     private Integer currentSelectedPlayerID = 0;
-    private Integer guardedPlayerID = 0;
-    private Integer intentKillPlayerID = 0;
-    private Boolean witcherHoldsAntidote = true;
-    private Boolean witcherHoldsPoison = true;
-    private Integer antidotePlayerID = 0;
-    private Integer poisonPlayerID = 0;
+    private Integer guardedPlayerID;
+    private Integer intentKillPlayerID;
+    private Boolean witcherHoldsAntidote;
+    private Boolean witcherHoldsPoison;
+    private Integer antidotePlayerID;
+    private Integer poisonPlayerID;
     private TextView actionLabel;
     private Button confirmButton;
     private Button witcherSaveButton;
@@ -44,7 +50,7 @@ public class Wolf extends AppCompatActivity {
             selectedPlayerID = Integer.parseInt((String) view.getContentDescription());
             if (currentSelectedPlayerID == selectedPlayerID){
                 selectedPlayerID = 0;
-                Toast.makeText(Wolf.this, "你取消了选择", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Night.this, "你取消了选择", Toast.LENGTH_SHORT).show();
                 if (currentCharacter.equals("Wolf")){
                     confirmButton.setEnabled(false);
                 }
@@ -60,7 +66,7 @@ public class Wolf extends AppCompatActivity {
                     witcherKillButton.setEnabled(false);
                 }
             } else {
-                Toast.makeText(Wolf.this, "你选择了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Night.this, "你选择了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
                 if (currentCharacter.equals("Witcher")){
                     if (witcherHoldsAntidote) {
                         if (selectedPlayerID == intentKillPlayerID) {
@@ -74,7 +80,13 @@ public class Wolf extends AppCompatActivity {
                     }
                 }
                 if (currentCharacter.equals("Guardian")){
-                    confirmButton.setText("守护");
+                    if (guardedPlayerID == selectedPlayerID) {
+                        Toast.makeText(Night.this, "你不能连续两晚守护同一玩家", Toast.LENGTH_SHORT).show();
+                        selectedPlayerID = 0;
+                        confirmButton.setText("跳过");
+                    } else {
+                        confirmButton.setText("守护");
+                    }
                 }
                 if (currentCharacter.equals("Seer")){
                     confirmButton.setEnabled(true);
@@ -88,17 +100,16 @@ public class Wolf extends AppCompatActivity {
 
     private View.OnClickListener confirmGuard = new View.OnClickListener() {
         public void onClick(View view) {
+            guardedPlayerID = selectedPlayerID;
             confirmButton.setEnabled(false);
             if (selectedPlayerID == 0){
-                Toast.makeText(Wolf.this, "你没有守护任何玩家", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Night.this, "你没有守护任何玩家", Toast.LENGTH_SHORT).show();
             } else {
-                guardedPlayerID = selectedPlayerID;
-                Toast.makeText(Wolf.this, "你守护了" + guardedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Night.this, "你守护了" + guardedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
             }
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
             if (mp.isPlaying()) {
-                Toast.makeText(Wolf.this, "Audio is playing, I will stop it", Toast.LENGTH_SHORT).show();
                 mp.stop();
                 mp.reset();
             }
@@ -106,7 +117,7 @@ public class Wolf extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mp = MediaPlayer.create(Wolf.this, R.raw.audio_guard_finish);
+                    mp = MediaPlayer.create(Night.this, R.raw.audio_guard_finish);
                     mp.setOnCompletionListener(prepareForNext);
                     mp.start();
                 }
@@ -125,7 +136,7 @@ public class Wolf extends AppCompatActivity {
     private View.OnClickListener confirmKill = new View.OnClickListener() {
         public void onClick(View view) {
             confirmButton.setEnabled(false);
-            Toast.makeText(Wolf.this, "你杀害了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Night.this, "你杀害了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
             intentKillPlayerID = selectedPlayerID;
             if (mp.isPlaying()) {
                 mp.stop();
@@ -137,7 +148,7 @@ public class Wolf extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mp = MediaPlayer.create(Wolf.this, R.raw.audio_wolf_finish);
+                    mp = MediaPlayer.create(Night.this, R.raw.audio_wolf_finish);
                     mp.setOnCompletionListener(prepareForNext);
                     mp.start();
                     //Hide wolf card
@@ -149,6 +160,7 @@ public class Wolf extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    makeUnClickable();
                     setupSeer();
                 }
             }, 12000);
@@ -157,7 +169,7 @@ public class Wolf extends AppCompatActivity {
 
     private View.OnClickListener confirmSave = new View.OnClickListener() {
         public void onClick(View view) {
-            Toast.makeText(Wolf.this, "你解救了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Night.this, "你解救了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
             if (mp.isPlaying()) {
                 mp.stop();
                 mp.reset();
@@ -175,7 +187,7 @@ public class Wolf extends AppCompatActivity {
 
     private View.OnClickListener witcherSkip = new View.OnClickListener() {
         public void onClick(View view) {
-            Toast.makeText(Wolf.this, "你没有进行操作", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Night.this, "你没有进行操作", Toast.LENGTH_SHORT).show();
             if (mp.isPlaying()) {
                 mp.stop();
                 mp.reset();
@@ -191,7 +203,7 @@ public class Wolf extends AppCompatActivity {
 
     private View.OnClickListener confirmPoison = new View.OnClickListener() {
         public void onClick(View view) {
-            Toast.makeText(Wolf.this, "你毒死了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Night.this, "你毒死了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
             if (mp.isPlaying()) {
                 mp.stop();
                 mp.reset();
@@ -218,7 +230,7 @@ public class Wolf extends AppCompatActivity {
                     goodCharacter = false;
                     characterLabel = "坏人";
             }
-            Toast.makeText(Wolf.this, selectedPlayerID + "号玩家是" + characterLabel, Toast.LENGTH_SHORT).show();
+            Toast.makeText(Night.this, selectedPlayerID + "号玩家是" + characterLabel, Toast.LENGTH_SHORT).show();
             showCharacter(goodCharacter, selectedPlayerID);
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
@@ -231,7 +243,7 @@ public class Wolf extends AppCompatActivity {
                         mp.reset();
                     }
                     hideWolf();
-                    mp = MediaPlayer.create(Wolf.this, R.raw.audio_seer_finish);
+                    mp = MediaPlayer.create(Night.this, R.raw.audio_seer_finish);
                     mp.setOnCompletionListener(prepareForNext);
                     mp.start();
                 }
@@ -268,27 +280,28 @@ public class Wolf extends AppCompatActivity {
         }
     };
 
-    private MediaPlayer.OnCompletionListener complete = new MediaPlayer.OnCompletionListener() {
-        @Override
-        public void onCompletion(MediaPlayer mp) {
-            Toast.makeText(Wolf.this, "Audi playback finished", Toast.LENGTH_SHORT).show();
-            mp.stop();
-            mp.reset();
-            mp.release();
-            mp = null;
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wolf);
+        setContentView(R.layout.activity_night);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            wolf = extras.getInt("wolf");
+            villagers = extras.getInt("villagers");
+            seer = extras.getInt("seer");
+            witcher = extras.getInt("witcher");
+            guardian = extras.getInt("guardian");
+            idiot = extras.getInt("idiot");
             playerID = (ArrayList<Integer>) getIntent().getSerializableExtra("id");
             assignedCharacterList = (ArrayList<String>) getIntent().getSerializableExtra("characters");
-            numPlayers = (Integer) extras.get("numPlayer");
+            numPlayers = (Integer) extras.get("numPlayers");
             alive = (ArrayList<Boolean>) getIntent().getSerializableExtra("alive");
+            guardedPlayerID = (Integer) extras.get("guardedPlayerID");
+            intentKillPlayerID = (Integer) extras.get("intentKillPlayerID");
+            antidotePlayerID = (Integer) extras.get("antidotePlayerID");
+            poisonPlayerID = (Integer) extras.get("poisonPlayerID");
+            witcherHoldsAntidote = (Boolean) extras.get("witcherHoldsAntidote");
+            witcherHoldsPoison = (Boolean) extras.get("witcherHoldsPoison");
         }
         init();
 
@@ -296,7 +309,7 @@ public class Wolf extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                mp = MediaPlayer.create(Wolf.this, R.raw.audio_night_start);
+                mp = MediaPlayer.create(Night.this, R.raw.audio_night_start);
                 mp.setOnCompletionListener(prepareForNext);
                 mp.start();
             }
@@ -349,65 +362,113 @@ public class Wolf extends AppCompatActivity {
                 case 1:
                     p1.setVisibility(View.GONE);
                     p1.setOnClickListener(selectPlayer);
+                    if (alive.get(i - 1) == false) {
+                        p1.setClickable(false);
+                        updateDeadCard(i - 1);
+                    }
                     break;
                 case 2:
                     p2.setVisibility(View.GONE);
                     p2.setOnClickListener(selectPlayer);
+                    if (alive.get(i - 1) == false) {
+                        p2.setClickable(false);
+                        updateDeadCard(i - 1);
+                    }
                     break;
                 case 3:
                     p3.setVisibility(View.GONE);
                     p3.setOnClickListener(selectPlayer);
+                    if (alive.get(i - 1) == false) {
+                        p3.setClickable(false);
+                        updateDeadCard(i - 1);
+                    }
                     break;
                 case 4:
                     p4.setVisibility(View.GONE);
                     p4.setOnClickListener(selectPlayer);
+                    if (alive.get(i - 1) == false) {
+                        p4.setClickable(false);
+                        updateDeadCard(i - 1);
+                    }
                     break;
                 case 5:
                     p5.setVisibility(View.GONE);
                     if (i <= numPlayers) {
                         p5.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == false) {
+                            p5.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
                     }
                     break;
                 case 6:
                     p6.setVisibility(View.GONE);
                     if (i <= numPlayers) {
                         p6.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == false) {
+                            p6.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
                     }
                     break;
                 case 7:
                     p7.setVisibility(View.GONE);
                     if (i <= numPlayers) {
                         p7.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == false) {
+                            p7.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
                     }
                     break;
                 case 8:
                     p8.setVisibility(View.GONE);
                     if (i <= numPlayers) {
                         p8.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == false) {
+                            p8.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
                     }
                     break;
                 case 9:
                     p9.setVisibility(View.GONE);
                     if (i <= numPlayers) {
                         p9.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == false) {
+                            p9.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
                     }
                     break;
                 case 10:
                     p10.setVisibility(View.GONE);
                     if (i <= numPlayers) {
                         p10.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == false) {
+                            p10.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
                     }
                     break;
                 case 11:
                     p11.setVisibility(View.GONE);
                     if (i <= numPlayers) {
                         p11.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == false) {
+                            p11.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
                     }
                     break;
                 case 12:
                     p12.setVisibility(View.GONE);
                     if (i <= numPlayers) {
                         p12.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == false) {
+                            p12.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
                     }
                     break;
             }
@@ -458,6 +519,169 @@ public class Wolf extends AppCompatActivity {
         }
     }
 
+    private void makeClickable() {
+        p1.setClickable(true);
+        p2.setClickable(true);
+        p3.setClickable(true);
+        p4.setClickable(true);
+        p5.setClickable(true);
+        p6.setClickable(true);
+        p7.setClickable(true);
+        p8.setClickable(true);
+        p9.setClickable(true);
+        p10.setClickable(true);
+        p11.setClickable(true);
+        p12.setClickable(true);
+    }
+
+    private void makeUnClickable() {
+        for (int i = 1; i < 13; i++) {
+            switch (i){
+                case 1:
+                    if (alive.get(i - 1) == false) {
+                        p1.setClickable(false);
+                        updateDeadCard(i - 1);
+                    }
+                    break;
+                case 2:
+                    if (alive.get(i - 1) == false) {
+                        p2.setClickable(false);
+                        updateDeadCard(i - 1);
+                    }
+                    break;
+                case 3:
+                    if (alive.get(i - 1) == false) {
+                        p3.setClickable(false);
+                        updateDeadCard(i - 1);
+                    }
+                    break;
+                case 4:
+                    if (alive.get(i - 1) == false) {
+                        p4.setClickable(false);
+                        updateDeadCard(i - 1);
+                    }
+                    break;
+                case 5:
+                    if (i <= numPlayers) {
+                        if (alive.get(i - 1) == false) {
+                            p5.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
+                    }
+                    break;
+                case 6:
+                    if (i <= numPlayers) {
+                        if (alive.get(i - 1) == false) {
+                            p6.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
+                    }
+                    break;
+                case 7:
+                    if (i <= numPlayers) {
+                        if (alive.get(i - 1) == false) {
+                            p7.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
+                    }
+                    break;
+                case 8:
+                    if (i <= numPlayers) {
+                        if (alive.get(i - 1) == false) {
+                            p8.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
+                    }
+                    break;
+                case 9:
+                    if (i <= numPlayers) {
+                        if (alive.get(i - 1) == false) {
+                            p9.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
+                    }
+                    break;
+                case 10:
+                    if (i <= numPlayers) {
+                        if (alive.get(i - 1) == false) {
+                            p10.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
+                    }
+                    break;
+                case 11:
+                    if (i <= numPlayers) {
+                        if (alive.get(i - 1) == false) {
+                            p11.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
+                    }
+                    break;
+                case 12:
+                    if (i <= numPlayers) {
+                        if (alive.get(i - 1) == false) {
+                            p12.setClickable(false);
+                            updateDeadCard(i - 1);
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void updateDeadCard(int i) {
+        switch (i) {
+            case 0:
+                p1.setImageResource(R.drawable.card_back_dead);
+                p1.setClickable(false);
+                break;
+            case 1:
+                p2.setImageResource(R.drawable.card_back_dead);
+                p2.setClickable(false);
+                break;
+            case 2:
+                p3.setImageResource(R.drawable.card_back_dead);
+                p3.setClickable(false);
+                break;
+            case 3:
+                p4.setImageResource(R.drawable.card_back_dead);
+                p4.setClickable(false);
+                break;
+            case 4:
+                p5.setImageResource(R.drawable.card_back_dead);
+                p5.setClickable(false);
+                break;
+            case 5:
+                p6.setImageResource(R.drawable.card_back_dead);
+                p6.setClickable(false);
+                break;
+            case 6:
+                p7.setImageResource(R.drawable.card_back_dead);
+                p7.setClickable(false);
+                break;
+            case 7:
+                p8.setImageResource(R.drawable.card_back_dead);
+                p8.setClickable(false);
+                break;
+            case 8:
+                p9.setImageResource(R.drawable.card_back_dead);
+                p9.setClickable(false);
+                break;
+            case 9:
+                p10.setImageResource(R.drawable.card_back_dead);
+                p10.setClickable(false);
+                break;
+            case 10:
+                p11.setImageResource(R.drawable.card_back_dead);
+                p11.setClickable(false);
+                break;
+            case 11:
+                p12.setImageResource(R.drawable.card_back_dead);
+                p12.setClickable(false);
+                break;
+        }
+    }
+
     private void setupGuardian() {
         currentCharacter = "Guardian";
         actionLabel.setText(R.string.guardTextLabel);
@@ -475,7 +699,8 @@ public class Wolf extends AppCompatActivity {
         confirmButton.setText("杀害");
         confirmButton.setEnabled(false);
         confirmButton.setOnClickListener(confirmKill);
-        mp = MediaPlayer.create(Wolf.this, R.raw.audio_wolf_start);
+        makeClickable();
+        mp = MediaPlayer.create(Night.this, R.raw.audio_wolf_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
         new Handler().postDelayed(new Runnable() {
@@ -581,7 +806,7 @@ public class Wolf extends AppCompatActivity {
         confirmButton.setEnabled(false);
         confirmButton.setOnClickListener(confirmSeek);
         actionLabel.setText(R.string.seerTextLabel);
-        mp = MediaPlayer.create(Wolf.this, R.raw.audio_seer_start);
+        mp = MediaPlayer.create(Night.this, R.raw.audio_seer_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
     }
@@ -642,7 +867,7 @@ public class Wolf extends AppCompatActivity {
         witcherKillButton.setVisibility(View.VISIBLE);
         witcherKillButton.setOnClickListener(confirmPoison);
         actionLabel.setText(R.string.actionTextLabel);
-        mp = MediaPlayer.create(Wolf.this, R.raw.audio_witcher_start);
+        mp = MediaPlayer.create(Night.this, R.raw.audio_witcher_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
         if (witcherHoldsAntidote) {
@@ -697,7 +922,7 @@ public class Wolf extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                mp = MediaPlayer.create(Wolf.this, R.raw.audio_witcher_finish);
+                mp = MediaPlayer.create(Night.this, R.raw.audio_witcher_finish);
                 mp.setOnCompletionListener(prepareForNext);
                 mp.start();
                 hideWolf();
@@ -720,8 +945,8 @@ public class Wolf extends AppCompatActivity {
 
     private void finishNight(){
         mp.release();
-        Toast.makeText(Wolf.this, "天亮了...", Toast.LENGTH_SHORT).show();
-        Intent day = new Intent(Wolf.this, Day.class);
+        Toast.makeText(Night.this, "天亮了...", Toast.LENGTH_SHORT).show();
+        Intent day = new Intent(Night.this, Day.class);
         day.putExtra("id", playerID);
         day.putExtra("characters", assignedCharacterList);
         day.putExtra("alive",alive);
@@ -730,6 +955,14 @@ public class Wolf extends AppCompatActivity {
         day.putExtra("intentKillPlayerID", intentKillPlayerID);
         day.putExtra("antidotePlayerID", antidotePlayerID);
         day.putExtra("poisonPlayerID", poisonPlayerID);
+        day.putExtra("witcherHoldsAntidote", witcherHoldsAntidote);
+        day.putExtra("witcherHoldsPoison", witcherHoldsPoison);
+        day.putExtra("wolf", wolf);
+        day.putExtra("villagers", villagers);
+        day.putExtra("seer", seer);
+        day.putExtra("witcher", witcher);
+        day.putExtra("guardian", guardian);
+        day.putExtra("idiot", idiot);
         startActivity(day);
     }
 }

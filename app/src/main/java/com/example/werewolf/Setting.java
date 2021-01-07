@@ -78,19 +78,6 @@ public class Setting extends AppCompatActivity {
         idiotNumber = (TextView)findViewById(R.id.idiotNumber);
         idiotNumber.setText(Integer.toString(idiot));
 
-        System.out.print(wolf);
-        System.out.println("个狼人");
-        System.out.print(villagers);
-        System.out.println("个平民");
-        System.out.print(seer);
-        System.out.println("个预言家");
-        System.out.print(witcher);
-        System.out.println("个女巫");
-        System.out.print(guardian);
-        System.out.println("个守卫");
-        System.out.print(idiot);
-        System.out.println("个白痴");
-
         villagerMinus = findViewById(R.id.villagerNumberMinus);
         villagerMinus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,8 +85,6 @@ public class Setting extends AppCompatActivity {
                 if (villagers > 1) {
                     villagers -= 1;
                 }
-                System.out.print(villagers);
-                System.out.println("个平民");
                 villagerNumber.setText(Integer.toString(villagers));
             }
         });
@@ -109,8 +94,6 @@ public class Setting extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 villagers += 1;
-                System.out.print(villagers);
-                System.out.println("个平民");
                 villagerNumber.setText(Integer.toString(villagers));
             }
         });
@@ -122,8 +105,6 @@ public class Setting extends AppCompatActivity {
                 if (wolf > 1) {
                     wolf -= 1;
                 }
-                System.out.print(wolf);
-                System.out.println("个狼人");
                 wolfNumber.setText(Integer.toString(wolf));
             }
         });
@@ -133,8 +114,6 @@ public class Setting extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 wolf += 1;
-                System.out.print(wolf);
-                System.out.println("个狼人");
                 wolfNumber.setText(Integer.toString(wolf));
             }
         });
@@ -146,8 +125,6 @@ public class Setting extends AppCompatActivity {
                 if (seer > 0) {
                     seer -= 1;
                 }
-                System.out.print(seer);
-                System.out.println("个预言家");
                 seerNumber.setText(Integer.toString(seer));
             }
         });
@@ -157,8 +134,6 @@ public class Setting extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 seer += 1;
-                System.out.print(seer);
-                System.out.println("个预言家");
                 seerNumber.setText(Integer.toString(seer));
             }
         });
@@ -170,8 +145,6 @@ public class Setting extends AppCompatActivity {
                 if (witcher > 0) {
                     witcher -= 1;
                 }
-                System.out.print(witcher);
-                System.out.println("个女巫");
                 witcherNumber.setText(Integer.toString(witcher));
             }
         });
@@ -181,8 +154,6 @@ public class Setting extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 witcher += 1;
-                System.out.print(witcher);
-                System.out.println("个女巫");
                 witcherNumber.setText(Integer.toString(witcher));
             }
         });
@@ -194,8 +165,6 @@ public class Setting extends AppCompatActivity {
                 if (guardian > 0) {
                     guardian -= 1;
                 }
-                System.out.print(guardian);
-                System.out.println("个守卫");
                 guardianNumber.setText(Integer.toString(guardian));
             }
         });
@@ -205,8 +174,6 @@ public class Setting extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 guardian += 1;
-                System.out.print(guardian);
-                System.out.println("个守卫");
                 guardianNumber.setText(Integer.toString(guardian));
             }
         });
@@ -218,8 +185,6 @@ public class Setting extends AppCompatActivity {
                 if (idiot > 0) {
                     idiot -= 1;
                 }
-                System.out.print(idiot);
-                System.out.println("个白痴");
                 idiotNumber.setText(Integer.toString(idiot));
             }
         });
@@ -229,28 +194,12 @@ public class Setting extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 idiot += 1;
-                System.out.print(idiot);
-                System.out.println("个白痴");
                 idiotNumber.setText(Integer.toString(idiot));
             }
         });
     }
 
     private void startGame() {
-        System.out.println("游戏开始！");
-        System.out.print(wolf);
-        System.out.println("个狼人");
-        System.out.print(villagers);
-        System.out.println("个平民");
-        System.out.print(seer);
-        System.out.println("个预言家");
-        System.out.print(witcher);
-        System.out.println("个女巫");
-        System.out.print(guardian);
-        System.out.println("个守卫");
-        System.out.print(idiot);
-        System.out.println("个白痴");
-
         Intent assignCharacter = new Intent(Setting.this, SetPlayerCharacter.class);
         assignCharacter.putExtra("wolf", wolf);
         assignCharacter.putExtra("villagers", villagers);

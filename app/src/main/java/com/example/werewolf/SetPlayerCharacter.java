@@ -37,6 +37,7 @@ public class SetPlayerCharacter extends AppCompatActivity {
 
     private View.OnClickListener seeCard = new View.OnClickListener() {
         public void onClick(View view) {
+            next.setEnabled(true);
             String c = assignedCharacterList.get(playerViewIndex - 1);
             switch(c) {
                 case "villager":
@@ -109,8 +110,6 @@ public class SetPlayerCharacter extends AppCompatActivity {
             }
 
             assignedCharacterList = getRandomCharacter(characterList, totalPlayers);
-            System.out.println(playerID);
-            System.out.println(assignedCharacterList);
 
             playerLabel = findViewById(R.id.viewCharacterLabel);
             playerLabel.setText("请1号玩家查看身份");
@@ -120,7 +119,7 @@ public class SetPlayerCharacter extends AppCompatActivity {
             cCard.setOnClickListener(seeCard);
 
             next = findViewById(R.id.nextPlayerButton);
-
+            next.setEnabled(false);
             next.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -145,6 +144,7 @@ public class SetPlayerCharacter extends AppCompatActivity {
 
     private void displayNext() {
         if (playerViewIndex < totalPlayers) {
+            next.setEnabled(false);
             playerViewIndex += 1;
             String s = "请" + Integer.toString(playerViewIndex) + "号玩家查看身份";
             playerLabel.setText(s);
@@ -165,8 +165,17 @@ public class SetPlayerCharacter extends AppCompatActivity {
 
     private void startGame() {
         Intent game = new Intent(SetPlayerCharacter.this, Game.class);
+
         game.putExtra("id", playerID);
         game.putExtra("characters", assignedCharacterList);
+        game.putExtra("finished", false);
+        game.putExtra("won", 0);
+        game.putExtra("wolf", wolf);
+        game.putExtra("villagers", villagers);
+        game.putExtra("seer", seer);
+        game.putExtra("witcher", witcher);
+        game.putExtra("guardian", guardian);
+        game.putExtra("idiot", idiot);
 
         startActivity(game);
     }
