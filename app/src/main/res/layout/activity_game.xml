@@ -48,17 +48,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/button" />
 
-    <TextView
-        android:id="@+id/logText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="开始游戏"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:visibility="invisible"
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="350dp"
+        android:layout_height="450dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="66dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="55dp"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <TextView
+            android:id="@+id/logText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="开始游戏"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/scrollView2"
+            app:layout_constraintEnd_toEndOf="@+id/scrollView2"
+            app:layout_constraintStart_toStartOf="@+id/scrollView2"
+            app:layout_constraintTop_toTopOf="@+id/scrollView2" />
+    </ScrollView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
