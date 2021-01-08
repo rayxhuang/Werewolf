@@ -6,15 +6,23 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Day extends AppCompatActivity {
+    private File file;
     private int wolf;
     private int villagers;
     private int seer;
@@ -72,6 +80,7 @@ public class Day extends AppCompatActivity {
             confirmButton.setEnabled(false);
             if (selectedPlayerID == 0) {
                 Toast.makeText(Day.this, "村民没有处决任何人", Toast.LENGTH_SHORT).show();
+                writeToFile("村民没有处决任何玩家\n", file);
                 actionLabel.setText("村民没有处决任何人");
                 actionLabel2.setText("");
             } else {
@@ -80,16 +89,29 @@ public class Day extends AppCompatActivity {
                     Integer idiotID = assignedCharacterList.indexOf("idiot") + 1;
                     if (selectedPlayerID == idiotID) {
                         Toast.makeText(Day.this, "村民处决了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                        writeToFile("村民处决了" + selectedPlayerID + "号玩家\n", file);
+                        writeToFile(selectedPlayerID + "号玩家的身份是白痴！\n", file);
+                        writeToFile(selectedPlayerID + "号玩家没有死亡\n", file);
                         actionLabel.setText("村民处决了" + selectedPlayerID + "号玩家");
                         actionLabel2.setText(selectedPlayerID + "号玩家的身份是白痴");
                         updateIdiotCard(selectedPlayerID - 1);
                     } else {
                         alive.set(selectedPlayerID - 1, false);
                         Toast.makeText(Day.this, "村民处决了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                        writeToFile("村民处决了" + selectedPlayerID + "号玩家\n", file);
+                        writeToFile(selectedPlayerID + "号玩家死了！\n", file);
                         actionLabel.setText("村民处决了");
                         actionLabel2.setText(selectedPlayerID + "号玩家");
                         updateDeadCard(selectedPlayerID - 1);
                     }
+                } else {
+                    alive.set(selectedPlayerID - 1, false);
+                    Toast.makeText(Day.this, "村民处决了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                    writeToFile("村民处决了" + selectedPlayerID + "号玩家\n", file);
+                    writeToFile(selectedPlayerID + "号玩家死了！\n", file);
+                    actionLabel.setText("村民处决了");
+                    actionLabel2.setText(selectedPlayerID + "号玩家");
+                    updateDeadCard(selectedPlayerID - 1);
                 }
             }
 
@@ -140,6 +162,7 @@ public class Day extends AppCompatActivity {
                                 night.putExtra("witcher", witcher);
                                 night.putExtra("guardian", guardian);
                                 night.putExtra("idiot", idiot);
+                                night.putExtra("file", file);
                                 startActivity(night);
                             }
                         }, 3000);
@@ -171,8 +194,10 @@ public class Day extends AppCompatActivity {
             poisonPlayerID = (Integer) extras.get("poisonPlayerID");
             witcherHoldsAntidote = (Boolean) extras.get("witcherHoldsAntidote");
             witcherHoldsPoison = (Boolean) extras.get("witcherHoldsPoison");
+            file = (File) extras.get("file");
         }
-
+        writeToFile("==========\n", file);
+        writeToFile("天亮了\n", file);
         init();
 
         //Day starts...
@@ -253,59 +278,83 @@ public class Day extends AppCompatActivity {
             }
         }
 
-        //this is only for adding onClickListeners
+        //Add onClickListeners to alive players
         for (int i = 1; i < 13; i++) {
             switch (i) {
                 case 1:
-                    p1.setOnClickListener(selectPlayer);
+                    if (alive.get(i - 1) == true) {
+                        p1.setOnClickListener(selectPlayer);
+                    }
                     break;
                 case 2:
-                    p2.setOnClickListener(selectPlayer);
+                    if (alive.get(i - 1) == true) {
+                        p2.setOnClickListener(selectPlayer);
+                    }
                     break;
                 case 3:
-                    p3.setOnClickListener(selectPlayer);
+                    if (alive.get(i - 1) == true) {
+                        p3.setOnClickListener(selectPlayer);
+                    }
                     break;
                 case 4:
-                    p4.setOnClickListener(selectPlayer);
+                    if (alive.get(i - 1) == true) {
+                        p4.setOnClickListener(selectPlayer);
+                    }
                     break;
                 case 5:
                     if (i <= numPlayers) {
-                        p5.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == true) {
+                            p5.setOnClickListener(selectPlayer);
+                        }
                     }
                     break;
                 case 6:
                     if (i <= numPlayers) {
-                        p6.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == true) {
+                            p6.setOnClickListener(selectPlayer);
+                        }
                     }
                     break;
                 case 7:
                     if (i <= numPlayers) {
-                        p7.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == true) {
+                            p7.setOnClickListener(selectPlayer);
+                        }
                     }
                     break;
                 case 8:
                     if (i <= numPlayers) {
-                        p8.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == true) {
+                            p8.setOnClickListener(selectPlayer);
+                        }
                     }
                     break;
                 case 9:
                     if (i <= numPlayers) {
-                        p9.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == true) {
+                            p9.setOnClickListener(selectPlayer);
+                        }
                     }
                     break;
                 case 10:
                     if (i <= numPlayers) {
-                        p10.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == true) {
+                            p10.setOnClickListener(selectPlayer);
+                        }
                     }
                     break;
                 case 11:
                     if (i <= numPlayers) {
-                        p11.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == true) {
+                            p11.setOnClickListener(selectPlayer);
+                        }
                     }
                     break;
                 case 12:
                     if (i <= numPlayers) {
-                        p12.setOnClickListener(selectPlayer);
+                        if (alive.get(i - 1) == true) {
+                            p12.setOnClickListener(selectPlayer);
+                        }
                     }
                     break;
             }
@@ -458,32 +507,50 @@ public class Day extends AppCompatActivity {
             }
         }
         if (poisonPlayerID != 0) {
-            deathID2 = poisonPlayerID;
-            alive.set(deathID2 - 1 , false);
-            updateDeadCard(deathID2 - 1);
-            if (deathID1 == 0) {
-                Toast.makeText(Day.this, "昨天晚上死亡的是" + deathID2 + "号玩家", Toast.LENGTH_SHORT).show();
-                actionLabel.setText("昨天晚上死亡的是");
-                actionLabel2.setText(deathID2 + "号玩家");
-            } else {
-                int firstID = deathID1;
-                int secondID = deathID2;
-                int tempID = 0;
-                if (firstID > secondID) {
-                    tempID = firstID;
-                    firstID = secondID;
-                    secondID = tempID;
+            if (alive.get(poisonPlayerID - 1) == true) {
+                deathID2 = poisonPlayerID;
+                alive.set(deathID2 - 1 , false);
+                updateDeadCard(deathID2 - 1);
+                if (deathID1 == 0) {
+                    Toast.makeText(Day.this, "昨天晚上死亡的是" + deathID2 + "号玩家", Toast.LENGTH_SHORT).show();
+                    writeToFile("晚上死亡的是" + deathID2 + "号玩家\n", file);
+                    actionLabel.setText("昨天晚上死亡的是");
+                    actionLabel2.setText(deathID2 + "号玩家");
+                } else {
+                    int firstID = deathID1;
+                    int secondID = deathID2;
+                    int tempID = 0;
+                    if (firstID > secondID) {
+                        tempID = firstID;
+                        firstID = secondID;
+                        secondID = tempID;
+                    }
+                    Toast.makeText(Day.this, "昨天晚上死亡的是" + firstID + "号玩家和" + secondID + "号玩家", Toast.LENGTH_SHORT).show();
+                    writeToFile("晚上死亡的是" + firstID + "号玩家\n", file);
+                    writeToFile("晚上死亡的是" + secondID + "号玩家\n", file);
+                    actionLabel.setText("昨天晚上死亡的是");
+                    actionLabel2.setText(firstID + "号玩家和" + secondID + "号玩家");
                 }
-                Toast.makeText(Day.this, "昨天晚上死亡的是" + firstID + "号玩家和" + secondID + "号玩家", Toast.LENGTH_SHORT).show();
-                actionLabel.setText("昨天晚上死亡的是");
-                actionLabel2.setText(firstID + "号玩家和" + secondID + "号玩家");
+            } else {
+                if (deathID1 == 0) {
+                    Toast.makeText(Day.this, "昨天晚上是平安夜", Toast.LENGTH_SHORT).show();
+                    writeToFile("昨天晚上是平安夜\n", file);
+                    actionLabel.setText("昨天晚上是平安夜");
+                } else {
+                    Toast.makeText(Day.this, "昨天晚上死亡的是" + deathID1 + "号玩家", Toast.LENGTH_SHORT).show();
+                    writeToFile("晚上死亡的是" + deathID1 + "号玩家\n", file);
+                    actionLabel.setText("昨天晚上死亡的是");
+                    actionLabel2.setText(deathID1 + "号玩家");
+                }
             }
         } else {
             if (deathID1 == 0) {
                 Toast.makeText(Day.this, "昨天晚上是平安夜", Toast.LENGTH_SHORT).show();
+                writeToFile("昨天晚上是平安夜\n", file);
                 actionLabel.setText("昨天晚上是平安夜");
             } else {
                 Toast.makeText(Day.this, "昨天晚上死亡的是" + deathID1 + "号玩家", Toast.LENGTH_SHORT).show();
+                writeToFile("晚上死亡的是" + deathID1 + "号玩家\n", file);
                 actionLabel.setText("昨天晚上死亡的是");
                 actionLabel2.setText(deathID1 + "号玩家");
             }
@@ -523,5 +590,26 @@ public class Day extends AppCompatActivity {
         }
         //Undecided
         return 0;
+    }
+
+    private void writeToFile(String data, File file) {
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(file,true);
+            output.write(data.getBytes());
+        }
+        catch (IOException e) {
+            Log.e("Exception", "Write failed " + e.toString());
+        }
+        finally {
+            if (output != null) {
+                try {
+                    output.close();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

@@ -2,14 +2,28 @@ package com.example.werewolf;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class Game extends AppCompatActivity {
@@ -31,7 +45,7 @@ public class Game extends AppCompatActivity {
     private Boolean finished;
     private Integer won;
 
-    private TextView text1;
+    private TextView text1, logText;
     private Button bt1, bt2;
 
     private int wolf;
@@ -67,6 +81,59 @@ public class Game extends AppCompatActivity {
         }
     };
 
+    private void writeToFile(String data, File file) {
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(file,true);
+            output.write(data.getBytes());
+        }
+        catch (IOException e) {
+            Log.e("Exception", "Write failed " + e.toString());
+        }
+        finally {
+            if (output != null) {
+                try {
+                    output.close();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private String readFromFile() {
+        String ret = "";
+        FileInputStream input = null;
+        try {
+            input = openFileInput("log.txt");
+            if (input != null) {
+                InputStreamReader inputReader = new InputStreamReader(input);
+                BufferedReader bufferedReader = new BufferedReader(inputReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append("\n").append(receiveString);
+                }
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (Exception e) {
+            Log.e("Exception", "Read failed " + e.toString());
+        }
+        finally {
+            if (input != null) {
+                try {
+                    input.close();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return ret;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +141,8 @@ public class Game extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            logText = findViewById(R.id.logText);
+
             text1 = findViewById(R.id.textView);
             bt1 = findViewById(R.id.button);
             bt2 = findViewById(R.id.button2);
@@ -97,6 +166,8 @@ public class Game extends AppCompatActivity {
             idiot = extras.getInt("idiot");
 
             if (finished) {
+                logText.setVisibility(View.VISIBLE);
+                logText.setText(readFromFile());
                 text1.setVisibility(View.VISIBLE);
                 text1.setVisibility(View.VISIBLE);
                 bt1.setVisibility(View.VISIBLE);
@@ -119,33 +190,47 @@ public class Game extends AppCompatActivity {
                     mp.start();
                 }
             } else {
-                for (int i = 0; i < assignedCharacterList.size(); i++){
-                    alive.add(true);
+                File file = new File(getFilesDir(), "log.txt");
+                try {
+                    file.delete();
                 }
-                int extraPlayers = 12 - assignedCharacterList.size();
-                for (int i = 0; i < extraPlayers; i++){
-                    alive.add(false);
-                    assignedCharacterList.add("None");
+                catch (Exception e) {
+                    e.printStackTrace();
                 }
+                finally {
+                    File file2 = new File(getFilesDir(), "log.txt");
+                    writeToFile("开始游戏\n", file2);
+                    for (int i = 0; i < assignedCharacterList.size(); i++){
+                        int j = i + 1;
+                        writeToFile(j + "号玩家的身份是: " + assignedCharacterList.get(i) + "\n", file2);
+                        alive.add(true);
+                    }
+                    int extraPlayers = 12 - assignedCharacterList.size();
+                    for (int i = 0; i < extraPlayers; i++){
+                        alive.add(false);
+                        assignedCharacterList.add("None");
+                    }
 
-                Intent night = new Intent(Game.this, Night.class);
-                night.putExtra("id", playerID);
-                night.putExtra("characters", assignedCharacterList);
-                night.putExtra("alive", alive);
-                night.putExtra("numPlayers", numPlayer);
-                night.putExtra("guardedPlayerID", 0);
-                night.putExtra("intentKillPlayerID", 0);
-                night.putExtra("antidotePlayerID", 0);
-                night.putExtra("poisonPlayerID", 0);
-                night.putExtra("witcherHoldsAntidote", true);
-                night.putExtra("witcherHoldsPoison", true);
-                night.putExtra("wolf", wolf);
-                night.putExtra("villagers", villagers);
-                night.putExtra("seer", seer);
-                night.putExtra("witcher", witcher);
-                night.putExtra("guardian", guardian);
-                night.putExtra("idiot", idiot);
-                startActivity(night);
+                    Intent night = new Intent(Game.this, Night.class);
+                    night.putExtra("id", playerID);
+                    night.putExtra("characters", assignedCharacterList);
+                    night.putExtra("alive", alive);
+                    night.putExtra("numPlayers", numPlayer);
+                    night.putExtra("guardedPlayerID", 0);
+                    night.putExtra("intentKillPlayerID", 0);
+                    night.putExtra("antidotePlayerID", 0);
+                    night.putExtra("poisonPlayerID", 0);
+                    night.putExtra("witcherHoldsAntidote", true);
+                    night.putExtra("witcherHoldsPoison", true);
+                    night.putExtra("wolf", wolf);
+                    night.putExtra("villagers", villagers);
+                    night.putExtra("seer", seer);
+                    night.putExtra("witcher", witcher);
+                    night.putExtra("guardian", guardian);
+                    night.putExtra("idiot", idiot);
+                    night.putExtra("file", file2);
+                    startActivity(night);
+                }
             }
         }
     }

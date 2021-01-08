@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -11,12 +12,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import static com.example.werewolf.R.string.killTextLabel;
 
 public class Night extends AppCompatActivity {
+    private File file;
     private int wolf;
     private int villagers;
     private int seer;
@@ -55,7 +64,7 @@ public class Night extends AppCompatActivity {
                     confirmButton.setEnabled(false);
                 }
                 if (currentCharacter.equals("Seer")){
-                    confirmButton.setEnabled(false);
+                    confirmButton.setText("跳过");
                 }
                 if (currentCharacter.equals("Guardian")){
                     confirmButton.setText("跳过");
@@ -70,7 +79,9 @@ public class Night extends AppCompatActivity {
                 if (currentCharacter.equals("Witcher")){
                     if (witcherHoldsAntidote) {
                         if (selectedPlayerID == intentKillPlayerID) {
-                            witcherSaveButton.setEnabled(true);
+                            if (selectedPlayerID - 1 != assignedCharacterList.indexOf("witcher")) {
+                                witcherSaveButton.setEnabled(true);
+                            }
                         } else {
                             witcherSaveButton.setEnabled(false);
                         }
@@ -89,7 +100,7 @@ public class Night extends AppCompatActivity {
                     }
                 }
                 if (currentCharacter.equals("Seer")){
-                    confirmButton.setEnabled(true);
+                    confirmButton.setText("查验");
                 }
                 if (currentCharacter.equals("Wolf")){
                     confirmButton.setEnabled(true);
@@ -102,10 +113,13 @@ public class Night extends AppCompatActivity {
         public void onClick(View view) {
             guardedPlayerID = selectedPlayerID;
             confirmButton.setEnabled(false);
+            makeClickable(false);
             if (selectedPlayerID == 0){
                 Toast.makeText(Night.this, "你没有守护任何玩家", Toast.LENGTH_SHORT).show();
+                writeToFile("守卫没有守护任何玩家\n", file);
             } else {
                 Toast.makeText(Night.this, "你守护了" + guardedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                writeToFile("守卫守护了" + guardedPlayerID + "号玩家\n", file);
             }
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
@@ -128,6 +142,7 @@ public class Night extends AppCompatActivity {
                 @Override
                 public void run() {
                     setupWolf();
+                    makeClickable(true);
                 }
             }, 12000);
         }
@@ -136,7 +151,9 @@ public class Night extends AppCompatActivity {
     private View.OnClickListener confirmKill = new View.OnClickListener() {
         public void onClick(View view) {
             confirmButton.setEnabled(false);
+            makeClickable(false);
             Toast.makeText(Night.this, "你杀害了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            writeToFile("狼人杀害了" + selectedPlayerID + "号玩家\n", file);
             intentKillPlayerID = selectedPlayerID;
             if (mp.isPlaying()) {
                 mp.stop();
@@ -177,8 +194,8 @@ public class Night extends AppCompatActivity {
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    makeUnClickable();
                                     setupSeer();
+                                    makeClickable(true);
                                 }
                             }, 9000);
                         }
@@ -187,8 +204,8 @@ public class Night extends AppCompatActivity {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                makeUnClickable();
                                 setupSeer();
+                                makeClickable(true);
                             }
                         }, 9000);
                     }
@@ -200,6 +217,7 @@ public class Night extends AppCompatActivity {
     private View.OnClickListener confirmSave = new View.OnClickListener() {
         public void onClick(View view) {
             Toast.makeText(Night.this, "你解救了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            writeToFile("女巫解救了" + selectedPlayerID + "号玩家\n", file);
             if (mp.isPlaying()) {
                 mp.stop();
                 mp.reset();
@@ -210,6 +228,7 @@ public class Night extends AppCompatActivity {
             witcherSaveButton.setEnabled(false);
             witcherKillButton.setEnabled(false);
             confirmButton.setEnabled(false);
+            makeClickable(false);
             antidotePlayerID = intentKillPlayerID;
             finishWitcher();
         }
@@ -218,6 +237,7 @@ public class Night extends AppCompatActivity {
     private View.OnClickListener witcherSkip = new View.OnClickListener() {
         public void onClick(View view) {
             Toast.makeText(Night.this, "你没有进行操作", Toast.LENGTH_SHORT).show();
+            writeToFile("女巫没有进行操作\n", file);
             if (mp.isPlaying()) {
                 mp.stop();
                 mp.reset();
@@ -227,6 +247,7 @@ public class Night extends AppCompatActivity {
             confirmButton.setEnabled(false);
             witcherSaveButton.setEnabled(false);
             witcherKillButton.setEnabled(false);
+            makeClickable(false);
             finishWitcher();
         }
     };
@@ -234,6 +255,7 @@ public class Night extends AppCompatActivity {
     private View.OnClickListener confirmPoison = new View.OnClickListener() {
         public void onClick(View view) {
             Toast.makeText(Night.this, "你毒死了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            writeToFile("女巫毒死了" + selectedPlayerID + "号玩家\n", file);
             if (mp.isPlaying()) {
                 mp.stop();
                 mp.reset();
@@ -245,6 +267,7 @@ public class Night extends AppCompatActivity {
             confirmButton.setEnabled(false);
             witcherSaveButton.setEnabled(false);
             witcherKillButton.setEnabled(false);
+            makeClickable(false);
             finishWitcher();
         }
     };
@@ -252,16 +275,23 @@ public class Night extends AppCompatActivity {
     private View.OnClickListener confirmSeek = new View.OnClickListener() {
         public void onClick(View view) {
             confirmButton.setEnabled(false);
-            String character = assignedCharacterList.get(selectedPlayerID - 1);
-            Boolean goodCharacter = true;
-            String characterLabel = "好人";
-            switch (character) {
-                case "wolf":
-                    goodCharacter = false;
-                    characterLabel = "坏人";
+            makeClickable(false);
+            if (selectedPlayerID != 0) {
+                String character = assignedCharacterList.get(selectedPlayerID - 1);
+                Boolean goodCharacter = true;
+                String characterLabel = "好人";
+                switch (character) {
+                    case "wolf":
+                        goodCharacter = false;
+                        characterLabel = "坏人";
+                }
+                Toast.makeText(Night.this, selectedPlayerID + "号玩家是" + characterLabel, Toast.LENGTH_SHORT).show();
+                writeToFile("预言家查验了" + selectedPlayerID + "号玩家\n", file);
+                showCharacter(goodCharacter, selectedPlayerID);
+            } else {
+                Toast.makeText(Night.this, "你没有查验任何人", Toast.LENGTH_SHORT).show();
+                writeToFile("预言家没有查验任何玩家\n", file);
             }
-            Toast.makeText(Night.this, selectedPlayerID + "号玩家是" + characterLabel, Toast.LENGTH_SHORT).show();
-            showCharacter(goodCharacter, selectedPlayerID);
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
             //Plays seer finish audio
@@ -285,6 +315,7 @@ public class Night extends AppCompatActivity {
                     public void run() {
                         if (assignedCharacterList.contains("witcher")){
                             setupWitcher();
+                            makeClickable(true);
                         }
                         //
                     }
@@ -332,7 +363,10 @@ public class Night extends AppCompatActivity {
             poisonPlayerID = (Integer) extras.get("poisonPlayerID");
             witcherHoldsAntidote = (Boolean) extras.get("witcherHoldsAntidote");
             witcherHoldsPoison = (Boolean) extras.get("witcherHoldsPoison");
+            file = (File) extras.get("file");
         }
+        writeToFile("==========\n", file);
+        writeToFile("天黑了\n", file);
         init();
 
         //Night starts...
@@ -549,19 +583,20 @@ public class Night extends AppCompatActivity {
         }
     }
 
-    private void makeClickable() {
-        p1.setClickable(true);
-        p2.setClickable(true);
-        p3.setClickable(true);
-        p4.setClickable(true);
-        p5.setClickable(true);
-        p6.setClickable(true);
-        p7.setClickable(true);
-        p8.setClickable(true);
-        p9.setClickable(true);
-        p10.setClickable(true);
-        p11.setClickable(true);
-        p12.setClickable(true);
+    //Toggle all cards' clickable status
+    private void makeClickable(Boolean t) {
+        p1.setClickable(t);
+        p2.setClickable(t);
+        p3.setClickable(t);
+        p4.setClickable(t);
+        p5.setClickable(t);
+        p6.setClickable(t);
+        p7.setClickable(t);
+        p8.setClickable(t);
+        p9.setClickable(t);
+        p10.setClickable(t);
+        p11.setClickable(t);
+        p12.setClickable(t);
     }
 
     private void makeUnClickable() {
@@ -662,52 +697,76 @@ public class Night extends AppCompatActivity {
     private void updateDeadCard(int i) {
         switch (i) {
             case 0:
-                p1.setImageResource(R.drawable.card_back_dead);
-                p1.setClickable(false);
+                if (alive.get(i) == false) {
+                    p1.setImageResource(R.drawable.card_back_dead);
+                    p1.setClickable(false);
+                }
                 break;
             case 1:
-                p2.setImageResource(R.drawable.card_back_dead);
-                p2.setClickable(false);
+                if (alive.get(i) == false) {
+                    p2.setImageResource(R.drawable.card_back_dead);
+                    p2.setClickable(false);
+                }
                 break;
             case 2:
-                p3.setImageResource(R.drawable.card_back_dead);
-                p3.setClickable(false);
+                if (alive.get(i) == false) {
+                    p3.setImageResource(R.drawable.card_back_dead);
+                    p3.setClickable(false);
+                }
                 break;
             case 3:
-                p4.setImageResource(R.drawable.card_back_dead);
-                p4.setClickable(false);
+                if (alive.get(i) == false) {
+                    p4.setImageResource(R.drawable.card_back_dead);
+                    p4.setClickable(false);
+                }
                 break;
             case 4:
-                p5.setImageResource(R.drawable.card_back_dead);
-                p5.setClickable(false);
+                if (alive.get(i) == false) {
+                    p5.setImageResource(R.drawable.card_back_dead);
+                    p5.setClickable(false);
+                }
                 break;
             case 5:
-                p6.setImageResource(R.drawable.card_back_dead);
-                p6.setClickable(false);
+                if (alive.get(i) == false) {
+                    p6.setImageResource(R.drawable.card_back_dead);
+                    p6.setClickable(false);
+                }
                 break;
             case 6:
-                p7.setImageResource(R.drawable.card_back_dead);
-                p7.setClickable(false);
+                if (alive.get(i) == false) {
+                    p7.setImageResource(R.drawable.card_back_dead);
+                    p7.setClickable(false);
+                }
                 break;
             case 7:
-                p8.setImageResource(R.drawable.card_back_dead);
-                p8.setClickable(false);
+                if (alive.get(i) == false) {
+                    p8.setImageResource(R.drawable.card_back_dead);
+                    p8.setClickable(false);
+                }
                 break;
             case 8:
-                p9.setImageResource(R.drawable.card_back_dead);
-                p9.setClickable(false);
+                if (alive.get(i) == false) {
+                    p9.setImageResource(R.drawable.card_back_dead);
+                    p9.setClickable(false);
+                }
                 break;
             case 9:
-                p10.setImageResource(R.drawable.card_back_dead);
-                p10.setClickable(false);
+                if (alive.get(i) == false) {
+                    p10.setImageResource(R.drawable.card_back_dead);
+                    p10.setClickable(false);
+                }
                 break;
             case 10:
-                p11.setImageResource(R.drawable.card_back_dead);
-                p11.setClickable(false);
+                if (alive.get(i) == false) {
+                    p11.setImageResource(R.drawable.card_back_dead);
+                    p11.setClickable(false);
+                }
                 break;
             case 11:
-                p12.setImageResource(R.drawable.card_back_dead);
-                p12.setClickable(false);
+                if (alive.get(i) == false) {
+                    p12.setImageResource(R.drawable.card_back_dead);
+                    p12.setClickable(false);
+                }
                 break;
         }
     }
@@ -729,7 +788,7 @@ public class Night extends AppCompatActivity {
         confirmButton.setText("杀害");
         confirmButton.setEnabled(false);
         confirmButton.setOnClickListener(confirmKill);
-        makeClickable();
+        makeClickable(true);
         mp = MediaPlayer.create(Night.this, R.raw.audio_wolf_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
@@ -746,40 +805,88 @@ public class Night extends AppCompatActivity {
             if (assignedCharacterList.get(i).equals("wolf")) {
                 switch (i) {
                     case 0:
-                        p1.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p1.setImageResource(R.drawable.wolf);
+                        } else {
+                            p1.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 1:
-                        p2.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p2.setImageResource(R.drawable.wolf);
+                        } else {
+                            p2.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 2:
-                        p3.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p3.setImageResource(R.drawable.wolf);
+                        } else {
+                            p3.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 3:
-                        p4.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p4.setImageResource(R.drawable.wolf);
+                        } else {
+                            p4.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 4:
-                        p5.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p5.setImageResource(R.drawable.wolf);
+                        } else {
+                            p5.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 5:
-                        p6.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p6.setImageResource(R.drawable.wolf);
+                        } else {
+                            p6.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 6:
-                        p7.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p7.setImageResource(R.drawable.wolf);
+                        } else {
+                            p7.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 7:
-                        p8.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p8.setImageResource(R.drawable.wolf);
+                        } else {
+                            p8.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 8:
-                        p9.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p9.setImageResource(R.drawable.wolf);
+                        } else {
+                            p9.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 9:
-                        p10.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p10.setImageResource(R.drawable.wolf);
+                        } else {
+                            p10.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 10:
-                        p11.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p11.setImageResource(R.drawable.wolf);
+                        } else {
+                            p11.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                     case 11:
-                        p12.setImageResource(R.drawable.wolf);
+                        if (alive.get(i) == true) {
+                            p12.setImageResource(R.drawable.wolf);
+                        } else {
+                            p12.setImageResource(R.drawable.wolf_dead);
+                        }
                         break;
                 }
             }
@@ -827,15 +934,17 @@ public class Night extends AppCompatActivity {
                     break;
             }
         }
+        makeUnClickable();
     }
 
     private void setupSeer() {
         currentCharacter = "Seer";
-        confirmButton.setText("查验");
+        confirmButton.setText("跳过");
         confirmButton.setVisibility(View.VISIBLE);
-        confirmButton.setEnabled(false);
+        confirmButton.setEnabled(true);
         confirmButton.setOnClickListener(confirmSeek);
         actionLabel.setText(R.string.seerTextLabel);
+        makeUnClickable();
         mp = MediaPlayer.create(Night.this, R.raw.audio_seer_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
@@ -993,6 +1102,7 @@ public class Night extends AppCompatActivity {
         day.putExtra("witcher", witcher);
         day.putExtra("guardian", guardian);
         day.putExtra("idiot", idiot);
+        day.putExtra("file", file);
         startActivity(day);
     }
 
@@ -1028,5 +1138,26 @@ public class Night extends AppCompatActivity {
         }
         //Undecided
         return 0;
+    }
+
+    private void writeToFile(String data, File file) {
+        FileOutputStream output = null;
+        try {
+            output = new FileOutputStream(file,true);
+            output.write(data.getBytes());
+        }
+        catch (IOException e) {
+            Log.e("Exception", "Write failed " + e.toString());
+        }
+        finally {
+            if (output != null) {
+                try {
+                    output.close();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
