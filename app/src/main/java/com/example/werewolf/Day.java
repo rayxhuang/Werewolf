@@ -59,10 +59,10 @@ public class Day extends AppCompatActivity {
             if (currentSelectedPlayerID == selectedPlayerID){
                 selectedPlayerID = 0;
                 Toast.makeText(Day.this, "你取消了选择", Toast.LENGTH_SHORT).show();
-                confirmButton.setEnabled(false);
+                confirmButton.setText("跳过");
             } else {
                 Toast.makeText(Day.this, "你选择了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
-                confirmButton.setEnabled(true);
+                confirmButton.setText("处决");
             }
         }
     };
@@ -70,16 +70,33 @@ public class Day extends AppCompatActivity {
     private View.OnClickListener votePlayer = new View.OnClickListener() {
         public void onClick(View view) {
             confirmButton.setEnabled(false);
-            Toast.makeText(Day.this, "村民处决了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
-            actionLabel.setText("村民处决了");
-            actionLabel2.setText(selectedPlayerID + "号玩家");
-            alive.set(selectedPlayerID - 1, false);
-            updateDeadCard(selectedPlayerID - 1);
+            if (selectedPlayerID == 0) {
+                Toast.makeText(Day.this, "村民没有处决任何人", Toast.LENGTH_SHORT).show();
+                actionLabel.setText("村民没有处决任何人");
+                actionLabel2.setText("");
+            } else {
+                //需要加上第二次票出白痴的情况
+                if (assignedCharacterList.contains("idiot")) {
+                    Integer idiotID = assignedCharacterList.indexOf("idiot") + 1;
+                    if (selectedPlayerID == idiotID) {
+                        Toast.makeText(Day.this, "村民处决了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                        actionLabel.setText("村民处决了" + selectedPlayerID + "号玩家");
+                        actionLabel2.setText(selectedPlayerID + "号玩家的身份是白痴");
+                        updateIdiotCard(selectedPlayerID - 1);
+                    } else {
+                        alive.set(selectedPlayerID - 1, false);
+                        Toast.makeText(Day.this, "村民处决了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                        actionLabel.setText("村民处决了");
+                        actionLabel2.setText(selectedPlayerID + "号玩家");
+                        updateDeadCard(selectedPlayerID - 1);
+                    }
+                }
+            }
 
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Integer won = judgeGame(assignedCharacterList, alive, numPlayers, false);
+                    Integer won = judgeGame(false);
                     if (won != 0) {
                         Intent game = new Intent(Day.this, Game.class);
 
@@ -173,22 +190,29 @@ public class Day extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Integer game = judgeGame(assignedCharacterList, alive, numPlayers, false);
-                if (game != 0) {
-                    if (game == 1) {
-                        actionLabel.setText("游戏结束");
-                        actionLabel2.setText("好人获胜");
-                    } else {
-                        actionLabel.setText("游戏结束");
-                        actionLabel2.setText("狼人获胜");
-                    }
+                Integer won = judgeGame(false);
+                if (won != 0) {
+                    Intent game = new Intent(Day.this, Game.class);
+
+                    game.putExtra("id", playerID);
+                    game.putExtra("characters", assignedCharacterList);
+                    game.putExtra("finished", true);
+                    game.putExtra("won", won);
+                    game.putExtra("wolf", wolf);
+                    game.putExtra("villagers", villagers);
+                    game.putExtra("seer", seer);
+                    game.putExtra("witcher", witcher);
+                    game.putExtra("guardian", guardian);
+                    game.putExtra("idiot", idiot);
+
+                    startActivity(game);
                 } else {
                     //Vote player
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            actionLabel.setText("请村民投票要处决的玩家");
-                            actionLabel2.setText("投票后请处决该玩家");
+                            actionLabel.setText("村民可以投票处决玩家");
+                            actionLabel2.setText("不处决玩家请跳过");
                         }
                     }, 5000);
                 }
@@ -201,8 +225,8 @@ public class Day extends AppCompatActivity {
         actionLabel.setText("天亮了");
         actionLabel2 = findViewById(R.id.actionLabel2);
         confirmButton = findViewById(R.id.confirmButton1);
-        confirmButton.setEnabled(false);
-        confirmButton.setText("处决");
+        confirmButton.setEnabled(true);
+        confirmButton.setText("跳过");
         confirmButton.setOnClickListener(votePlayer);
 
         p1 = findViewById(R.id.p1Card1);
@@ -370,6 +394,47 @@ public class Day extends AppCompatActivity {
         }
     }
 
+    private void updateIdiotCard(int i) {
+        switch (i) {
+            case 0:
+                p1.setImageResource(R.drawable.idiot);
+                break;
+            case 1:
+                p2.setImageResource(R.drawable.idiot);
+                break;
+            case 2:
+                p3.setImageResource(R.drawable.idiot);
+                break;
+            case 3:
+                p4.setImageResource(R.drawable.idiot);
+                break;
+            case 4:
+                p5.setImageResource(R.drawable.idiot);
+                break;
+            case 5:
+                p6.setImageResource(R.drawable.idiot);
+                break;
+            case 6:
+                p7.setImageResource(R.drawable.idiot);
+                break;
+            case 7:
+                p8.setImageResource(R.drawable.idiot);
+                break;
+            case 8:
+                p9.setImageResource(R.drawable.idiot);
+                break;
+            case 9:
+                p10.setImageResource(R.drawable.idiot);
+                break;
+            case 10:
+                p11.setImageResource(R.drawable.idiot);
+                break;
+            case 11:
+                p12.setImageResource(R.drawable.idiot);
+                break;
+        }
+    }
+
     private void judgeDeath() {
         //        Judge death(s)
         if (intentKillPlayerID != 0) {
@@ -425,7 +490,7 @@ public class Day extends AppCompatActivity {
         }
     }
 
-    private Integer judgeGame(ArrayList<String> assignedCharacterList, ArrayList<Boolean> alive, Integer numPlayers, Boolean all) {
+    private Integer judgeGame(Boolean all) {
         //0 stands for undecided victory
         //1 stands for human victory
         //2 stands for werewolf victory

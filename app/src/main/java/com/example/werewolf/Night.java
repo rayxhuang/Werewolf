@@ -144,6 +144,7 @@ public class Night extends AppCompatActivity {
             }
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
+
             //Plays wolf finish audio
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -153,17 +154,46 @@ public class Night extends AppCompatActivity {
                     mp.start();
                     //Hide wolf card
                     hideWolf();
+                    if (guardedPlayerID != intentKillPlayerID) {
+                        Integer won = judgeGame(false);
+                        if (won == 2){
+                            mp.release();
+                            Intent game = new Intent(Night.this, Game.class);
+
+                            game.putExtra("id", playerID);
+                            game.putExtra("characters", assignedCharacterList);
+                            game.putExtra("finished", true);
+                            game.putExtra("won", won);
+                            game.putExtra("wolf", wolf);
+                            game.putExtra("villagers", villagers);
+                            game.putExtra("seer", seer);
+                            game.putExtra("witcher", witcher);
+                            game.putExtra("guardian", guardian);
+                            game.putExtra("idiot", idiot);
+
+                            startActivity(game);
+                        } else {
+                            //Setup seer
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    makeUnClickable();
+                                    setupSeer();
+                                }
+                            }, 9000);
+                        }
+                    } else {
+                        //Setup seer
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                makeUnClickable();
+                                setupSeer();
+                            }
+                        }, 9000);
+                    }
                 }
             }, 3000);
-
-            //Setup seer
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    makeUnClickable();
-                    setupSeer();
-                }
-            }, 12000);
         }
     };
 
@@ -964,5 +994,39 @@ public class Night extends AppCompatActivity {
         day.putExtra("guardian", guardian);
         day.putExtra("idiot", idiot);
         startActivity(day);
+    }
+
+    private Integer judgeGame(Boolean all) {
+        //0 stands for undecided victory
+        //2 stands for werewolf victory
+        if (assignedCharacterList.contains("witcher") && witcherHoldsAntidote.equals(true)) {return 0;}
+        ArrayList<Boolean> intentAlive = new ArrayList<Boolean>(alive);
+        intentAlive.set(intentKillPlayerID - 1, false);
+        Integer totalGod = 0, totalVillager = 0, totalWolf = 0;
+        Integer aliveGod = 0, aliveVillager = 0, aliveWolf = 0;
+        for (int i = 0; i < numPlayers; i++) {
+            switch (assignedCharacterList.get(i)) {
+                case "wolf":
+                    totalWolf += 1;
+                    if (intentAlive.get(i).equals(true)) {aliveWolf += 1;}
+                    break;
+                case "villager":
+                    totalVillager += 1;
+                    if (intentAlive.get(i).equals(true)) {aliveVillager += 1;}
+                    break;
+                default:
+                    totalGod += 1;
+                    if (intentAlive.get(i).equals(true)) {aliveGod += 1;}
+                    break;
+            }
+        }
+        if (all) {
+            if (aliveGod + aliveVillager == 0) {return 2;}
+        } else {
+            if (aliveVillager == 0) {return 2;}
+            if (aliveGod == 0) {return 2;}
+        }
+        //Undecided
+        return 0;
     }
 }

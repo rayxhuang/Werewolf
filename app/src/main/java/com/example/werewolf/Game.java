@@ -18,6 +18,7 @@ public class Game extends AppCompatActivity {
         @Override
         public void onCompletion(MediaPlayer mp) {
             mp.stop();
+            mp.reset();
             mp.release();
             mp = null;
         }
@@ -102,14 +103,20 @@ public class Game extends AppCompatActivity {
                 bt2.setVisibility(View.VISIBLE);
                 bt1.setEnabled(true);
                 bt2.setEnabled(true);
-                bt1.setText("再来一局");
+                bt1.setText("重新开始");
                 bt1.setOnClickListener(startAgain);
                 bt2.setText("更改配置");
                 bt2.setOnClickListener(changeSettings);
                 if (won == 1) {
                     text1.setText("游戏结束, 好人获胜!");
+                    mp = MediaPlayer.create(Game.this, R.raw.audio_wolf_lost);
+                    mp.setOnCompletionListener(complete);
+                    mp.start();
                 } else {
                     text1.setText("游戏结束, 狼人获胜!");
+                    mp = MediaPlayer.create(Game.this, R.raw.audio_wolf_won);
+                    mp.setOnCompletionListener(complete);
+                    mp.start();
                 }
             } else {
                 for (int i = 0; i < assignedCharacterList.size(); i++){
