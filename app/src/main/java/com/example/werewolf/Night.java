@@ -113,6 +113,7 @@ public class Night extends AppCompatActivity {
         public void onClick(View view) {
             guardedPlayerID = selectedPlayerID;
             confirmButton.setEnabled(false);
+            hideRevealed();
             makeAllClickable(false);
             if (selectedPlayerID == 0){
                 actionLabel.setText("你没有守护任何玩家");
@@ -260,6 +261,7 @@ public class Night extends AppCompatActivity {
     private final View.OnClickListener confirmSeek = new View.OnClickListener() {
         public void onClick(View view) {
             confirmButton.setEnabled(false);
+            hideRevealed();
             makeAllClickable(false);
             if (selectedPlayerID != 0) {
                 String character = assignedCharacterList.get(selectedPlayerID - 1);
@@ -468,6 +470,14 @@ public class Night extends AppCompatActivity {
         pCollection.get(i).setImageResource(R.drawable.card_back_dead);
     }
 
+    //This function replaces all assigned cards back to original numbered card
+    private void hideRevealed() {
+        for (int i = 0; i < numPlayers; i++) {
+            pCollection.get(i).setImageResource(cCollection.get(i));
+        }
+        makeDeadCardUnClickable();
+    }
+
     //This function setup Guardian
     private void setupGuardian() {
         currentCharacter = "Guardian";
@@ -475,9 +485,18 @@ public class Night extends AppCompatActivity {
         confirmButton.setEnabled(true);
         confirmButton.setText(R.string.skipTextLabel);
         confirmButton.setOnClickListener(confirmGuard);
+        showGuardian();
         mp = MediaPlayer.create(this, R.raw.audio_guardian_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
+    }
+
+    private void showGuardian() {
+        for (int i = 0; i < numPlayers; i++) {
+            if (assignedCharacterList.get(i).equals("guardian")) {
+                pCollection.get(i).setImageResource(R.drawable.guardian);
+            }
+        }
     }
 
     //This function setup Wolf
@@ -511,20 +530,13 @@ public class Night extends AppCompatActivity {
         }
     }
 
-    //This function replaces all assigned cards back to original numbered card
-    private void hideRevealed() {
-        for (int i = 0; i < numPlayers; i++) {
-            pCollection.get(i).setImageResource(cCollection.get(i));
-        }
-        makeDeadCardUnClickable();
-    }
-
     private void setupSeer() {
         currentCharacter = "Seer";
         confirmButton.setText("跳过");
         confirmButton.setVisibility(View.VISIBLE);
         confirmButton.setEnabled(true);
         confirmButton.setOnClickListener(confirmSeek);
+        showSeer();
         actionLabel.setText(R.string.seerTextLabel);
         makeDeadCardUnClickable();
         mp = MediaPlayer.create(Night.this, R.raw.audio_seer_start);
@@ -532,49 +544,20 @@ public class Night extends AppCompatActivity {
         mp.start();
     }
 
+    private void showSeer() {
+        for (int i = 0; i < numPlayers; i++) {
+            if (assignedCharacterList.get(i).equals("seer")) {
+                pCollection.get(i).setImageResource(R.drawable.seer);
+            }
+        }
+    }
+
     private void showCharacter(Boolean g, int i) {
         int resID = R.drawable.villager;
         if (!g) {
             resID = R.drawable.wolf;
         }
-        switch (i-1) {
-            case 0:
-                p1.setImageResource(resID);
-                break;
-            case 1:
-                p2.setImageResource(resID);
-                break;
-            case 2:
-                p3.setImageResource(resID);
-                break;
-            case 3:
-                p4.setImageResource(resID);
-                break;
-            case 4:
-                p5.setImageResource(resID);
-                break;
-            case 5:
-                p6.setImageResource(resID);
-                break;
-            case 6:
-                p7.setImageResource(resID);
-                break;
-            case 7:
-                p8.setImageResource(resID);
-                break;
-            case 8:
-                p9.setImageResource(resID);
-                break;
-            case 9:
-                p10.setImageResource(resID);
-                break;
-            case 10:
-                p11.setImageResource(resID);
-                break;
-            case 11:
-                p12.setImageResource(resID);
-                break;
-        }
+        pCollection.get(i - 1).setImageResource(resID);
     }
 
     private void setupWitcher() {
@@ -583,6 +566,7 @@ public class Night extends AppCompatActivity {
         confirmButton.setText(R.string.skipTextLabel);
         confirmButton.setOnClickListener(witcherSkip);
         confirmButton.setText("跳过");
+        showWitcher();
         witcherSaveButton.setVisibility(View.VISIBLE);
         witcherSaveButton.setOnClickListener(confirmSave);
         witcherKillButton.setVisibility(View.VISIBLE);
@@ -596,46 +580,16 @@ public class Night extends AppCompatActivity {
         }
     }
 
-    private void showIntentKill(int i){
-        i -= 1;
-        switch (i) {
-            case 0:
-                p1.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 1:
-                p2.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 2:
-                p3.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 3:
-                p4.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 4:
-                p5.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 5:
-                p6.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 6:
-                p7.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 7:
-                p8.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 8:
-                p9.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 9:
-                p10.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 10:
-                p11.setImageResource(R.drawable.card_back_intent_kill);
-                break;
-            case 11:
-                p12.setImageResource(R.drawable.card_back_intent_kill);
-                break;
+    private void showWitcher() {
+        for (int i = 0; i < numPlayers; i++) {
+            if (assignedCharacterList.get(i).equals("witcher")) {
+                pCollection.get(i).setImageResource(R.drawable.witcher);
+            }
         }
+    }
+
+    private void showIntentKill(int i){
+        pCollection.get(i - 1).setImageResource(R.drawable.card_back_intent_kill);
     }
 
     private void finishWitcher() {
