@@ -59,6 +59,7 @@ public class Game extends AppCompatActivity {
             assignCharacter.putExtra("witcher", witcher);
             assignCharacter.putExtra("guardian", guardian);
             assignCharacter.putExtra("idiot", idiot);
+            assignCharacter.putExtra("hunter", hunter);
             assignCharacter.putExtra("mode", mode);
             startActivity(assignCharacter);
         }
