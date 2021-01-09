@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,381 +11,539 @@
     android:orientation="vertical"
     tools:context=".Setting">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/playerText"
+        android:layout_width="175dp"
+        android:layout_height="56dp"
+        android:gravity="center"
+        android:text="@string/gameTitle"
+        android:textColor="#FFFFFF"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/startGameButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.037" />
 
-        <TextView
-            android:id="@+id/playerText"
-            android:layout_width="175dp"
-            android:layout_height="56dp"
-            android:gravity="center"
-            android:text="@string/gameTitle"
-            android:textColor="#FFFFFF"
-            android:textSize="36sp"
-            app:layout_constraintBottom_toTopOf="@+id/startGameButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.502"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.037" />
+    <Button
+        android:id="@+id/startGameButton"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="40dp"
+        android:text="@string/startGameLabel"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/startGameButton"
-            android:layout_width="150dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="40dp"
-            android:text="@string/startGameLabel"
-            android:textStyle="bold|italic"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/startGameButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playerText">
 
-        <ImageView
-            android:id="@+id/wolfView"
-            android:layout_width="150dp"
-            android:layout_height="240dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="150dp"
-            android:layout_marginEnd="52dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="@string/character_description_wolf"
-            android:src="@drawable/wolf"
-            app:layout_constraintBottom_toTopOf="@+id/wolfNumberMinus"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/villagerView"
-            app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/villagerView"
-            android:layout_width="150dp"
-            android:layout_height="240dp"
-            android:layout_marginStart="52dp"
-            android:layout_marginTop="150dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="@string/character_description_villager"
-            android:src="@drawable/villager"
-            app:layout_constraintBottom_toTopOf="@+id/villagerNumber"
-            app:layout_constraintEnd_toStartOf="@+id/wolfView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <ImageView
+                android:id="@+id/wolfView"
+                android:layout_width="150dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="52dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/character_description_wolf"
+                android:src="@drawable/wolf"
+                app:layout_constraintBottom_toTopOf="@+id/wolfNumber"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/villagerView"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/seerView"
-            android:layout_width="150dp"
-            android:layout_height="240dp"
-            android:layout_marginStart="52dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:contentDescription="@string/character_description_seer"
-            android:src="@drawable/seer"
-            app:layout_constraintEnd_toStartOf="@+id/witcherView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/villagerNumber" />
+            <ImageView
+                android:id="@+id/villagerView"
+                android:layout_width="150dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="52dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/character_description_villager"
+                android:src="@drawable/villager"
+                app:layout_constraintBottom_toTopOf="@+id/villagerNumber"
+                app:layout_constraintEnd_toStartOf="@+id/wolfView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/witcherView"
-            android:layout_width="150dp"
-            android:layout_height="240dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="52dp"
-            android:contentDescription="@string/character_description_witcher"
-            android:src="@drawable/witcher"
-            app:layout_constraintBottom_toTopOf="@+id/witcherNumber"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/seerView"
-            app:layout_constraintTop_toBottomOf="@+id/wolfNumberMinus" />
+            <ImageView
+                android:id="@+id/seerView"
+                android:layout_width="150dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="52dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/character_description_seer"
+                android:src="@drawable/seer"
+                app:layout_constraintBottom_toTopOf="@+id/seerNumber"
+                app:layout_constraintEnd_toStartOf="@+id/witcherView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/villagerNumber" />
 
-        <ImageView
-            android:id="@+id/guardianView"
-            android:layout_width="150dp"
-            android:layout_height="240dp"
-            android:layout_marginStart="52dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:contentDescription="@string/character_description_guardian"
-            android:src="@drawable/guardian"
-            app:layout_constraintEnd_toStartOf="@+id/idiotView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/seerNumber" />
+            <ImageView
+                android:id="@+id/witcherView"
+                android:layout_width="150dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="52dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/character_description_witcher"
+                android:src="@drawable/witcher"
+                app:layout_constraintBottom_toTopOf="@+id/witcherNumber"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/seerView"
+                app:layout_constraintTop_toBottomOf="@+id/wolfNumber" />
 
-        <ImageView
-            android:id="@+id/idiotView"
-            android:layout_width="150dp"
-            android:layout_height="240dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="52dp"
-            android:contentDescription="@string/character_description_idoit"
-            android:src="@drawable/idiot"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/guardianView"
-            app:layout_constraintTop_toBottomOf="@+id/witcherNumber" />
+            <ImageView
+                android:id="@+id/guardianView"
+                android:layout_width="150dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="52dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/character_description_guardian"
+                android:src="@drawable/guardian"
+                app:layout_constraintBottom_toTopOf="@+id/guardianNumber"
+                app:layout_constraintEnd_toStartOf="@+id/idiotView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seerNumber" />
 
-        <TextView
-            android:id="@+id/villagerNumber"
-            android:layout_width="75dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="8dp"
-            android:background="@null"
-            android:ems="10"
-            android:gravity="bottom|center_horizontal"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toStartOf="@+id/villagerNumberPlus"
-            app:layout_constraintStart_toEndOf="@+id/villagerNumberMinus"
-            app:layout_constraintTop_toBottomOf="@+id/villagerView" />
+            <ImageView
+                android:id="@+id/idiotView"
+                android:layout_width="150dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="52dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/character_description_idoit"
+                android:src="@drawable/idiot"
+                app:layout_constraintBottom_toTopOf="@+id/idiotNumber"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/guardianView"
+                app:layout_constraintTop_toBottomOf="@+id/witcherNumber" />
 
-        <TextView
-            android:id="@+id/wolfNumber"
-            android:layout_width="75dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:background="@null"
-            android:ems="10"
-            android:gravity="bottom|center_horizontal"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/witcherView"
-            app:layout_constraintEnd_toStartOf="@+id/wolfNumberPlus"
-            app:layout_constraintStart_toEndOf="@+id/wolfNumberMinus"
-            app:layout_constraintTop_toBottomOf="@+id/wolfView" />
+            <ImageView
+                android:id="@+id/hunterView"
+                android:layout_width="150dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="52dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="20dp"
+                android:contentDescription="@string/character_description_hunter"
+                android:src="@drawable/hunter"
+                app:layout_constraintBottom_toTopOf="@+id/hunterNumber"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/wolfKingView"
+                app:layout_constraintTop_toBottomOf="@+id/guardianNumber" />
 
-        <TextView
-            android:id="@+id/seerNumber"
-            android:layout_width="75dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@null"
-            android:ems="10"
-            android:gravity="bottom|center_horizontal"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/guardianView"
-            app:layout_constraintEnd_toStartOf="@+id/seerNumberPlus"
-            app:layout_constraintStart_toEndOf="@+id/seerNumberMinus"
-            app:layout_constraintTop_toBottomOf="@+id/seerView" />
+            <ImageView
+                android:id="@+id/wolfKingView"
+                android:layout_width="150dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="52dp"
+                android:layout_marginBottom="8dp"
+                android:contentDescription="@string/character_description_wolf_king"
+                android:src="@drawable/wolf_king"
+                app:layout_constraintBottom_toTopOf="@+id/wolfKingNumber"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/hunterView"
+                app:layout_constraintTop_toBottomOf="@+id/idiotNumber" />
 
-        <TextView
-            android:id="@+id/witcherNumber"
-            android:layout_width="75dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@null"
-            android:ems="10"
-            android:gravity="bottom|center_horizontal"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/idiotView"
-            app:layout_constraintEnd_toStartOf="@+id/witcherNumberPlus"
-            app:layout_constraintStart_toEndOf="@+id/witcherNumberMinus"
-            app:layout_constraintTop_toBottomOf="@+id/witcherView" />
+            <TextView
+                android:id="@+id/villagerNumber"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@null"
+                android:ems="10"
+                android:gravity="bottom|center_horizontal"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/seerView"
+                app:layout_constraintEnd_toStartOf="@+id/villagerNumberPlus"
+                app:layout_constraintStart_toEndOf="@+id/villagerNumberMinus"
+                app:layout_constraintTop_toBottomOf="@+id/villagerView" />
 
-        <TextView
-            android:id="@+id/guardianNumber"
-            android:layout_width="75dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="130dp"
-            android:background="@null"
-            android:ems="10"
-            android:gravity="bottom|center_horizontal"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/guardianNumberPlus"
-            app:layout_constraintStart_toEndOf="@+id/guardianNumberMinus"
-            app:layout_constraintTop_toBottomOf="@+id/guardianView" />
+            <TextView
+                android:id="@+id/wolfNumber"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@null"
+                android:ems="10"
+                android:gravity="bottom|center_horizontal"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/witcherView"
+                app:layout_constraintEnd_toStartOf="@+id/wolfNumberPlus"
+                app:layout_constraintStart_toEndOf="@+id/wolfNumberMinus"
+                app:layout_constraintTop_toBottomOf="@+id/wolfView" />
+
+            <TextView
+                android:id="@+id/seerNumber"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@null"
+                android:ems="10"
+                android:gravity="bottom|center_horizontal"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/guardianView"
+                app:layout_constraintEnd_toStartOf="@+id/seerNumberPlus"
+                app:layout_constraintStart_toEndOf="@+id/seerNumberMinus"
+                app:layout_constraintTop_toBottomOf="@+id/seerView" />
+
+            <TextView
+                android:id="@+id/witcherNumber"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@null"
+                android:ems="10"
+                android:gravity="bottom|center_horizontal"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/idiotView"
+                app:layout_constraintEnd_toStartOf="@+id/witcherNumberPlus"
+                app:layout_constraintStart_toEndOf="@+id/witcherNumberMinus"
+                app:layout_constraintTop_toBottomOf="@+id/witcherView" />
 
 
-        <TextView
-            android:id="@+id/idiotNumber"
-            android:layout_width="75dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="130dp"
-            android:background="@null"
-            android:ems="10"
-            android:gravity="bottom|center_horizontal"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/idiotNumberPlus"
-            app:layout_constraintStart_toEndOf="@+id/idiotNumberMinus"
-            app:layout_constraintTop_toBottomOf="@+id/idiotView" />
+            <TextView
+                android:id="@+id/guardianNumber"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@null"
+                android:ems="10"
+                android:gravity="bottom|center_horizontal"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/hunterView"
+                app:layout_constraintEnd_toStartOf="@+id/guardianNumberPlus"
+                app:layout_constraintStart_toEndOf="@+id/guardianNumberMinus"
+                app:layout_constraintTop_toBottomOf="@+id/guardianView" />
 
-        <ImageView
-            android:id="@+id/villagerNumberMinus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="54dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="减少一个村民"
-            app:layout_constraintBottom_toTopOf="@+id/seerView"
-            app:layout_constraintEnd_toStartOf="@+id/villagerNumber"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/villagerView"
-            app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
+            <TextView
+                android:id="@+id/idiotNumber"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@null"
+                android:ems="10"
+                android:gravity="bottom|center_horizontal"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toTopOf="@+id/wolfKingView"
+                app:layout_constraintEnd_toStartOf="@+id/idiotNumberPlus"
+                app:layout_constraintStart_toEndOf="@+id/idiotNumberMinus"
+                app:layout_constraintTop_toBottomOf="@+id/idiotView" />
 
-        <ImageView
-            android:id="@+id/wolfNumberMinus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="34dp"
-            android:layout_marginTop="16dp"
-            android:contentDescription="减少一个狼人"
-            app:layout_constraintEnd_toStartOf="@+id/wolfNumber"
-            app:layout_constraintStart_toEndOf="@+id/villagerNumberPlus"
-            app:layout_constraintTop_toBottomOf="@+id/wolfView"
-            app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
+            <TextView
+                android:id="@+id/hunterNumber"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="30dp"
+                android:background="@null"
+                android:ems="10"
+                android:gravity="bottom|center_horizontal"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/hunterNumberPlus"
+                app:layout_constraintStart_toEndOf="@+id/hunterNumberMinus"
+                app:layout_constraintTop_toBottomOf="@+id/hunterView" />
 
-        <ImageView
-            android:id="@+id/seerNumberMinus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="54dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="减少一个预言家"
-            app:layout_constraintBottom_toTopOf="@+id/guardianView"
-            app:layout_constraintEnd_toStartOf="@+id/seerNumber"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/seerView"
-            app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
+            <TextView
+                android:id="@+id/wolfKingNumber"
+                android:layout_width="75dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="30dp"
+                android:background="@null"
+                android:ems="10"
+                android:gravity="bottom|center_horizontal"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/wolfKingNumberPlus"
+                app:layout_constraintStart_toEndOf="@+id/wolfKingNumberMinus"
+                app:layout_constraintTop_toBottomOf="@+id/wolfKingView" />
 
-        <ImageView
-            android:id="@+id/witcherNumberMinus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="34dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="减少一个女巫"
-            app:layout_constraintBottom_toTopOf="@+id/idiotView"
-            app:layout_constraintEnd_toStartOf="@+id/witcherNumber"
-            app:layout_constraintStart_toEndOf="@+id/seerNumberPlus"
-            app:layout_constraintTop_toBottomOf="@+id/witcherView"
-            app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
+            <ImageView
+                android:id="@+id/villagerNumberMinus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="减少一个村民"
+                app:layout_constraintBottom_toTopOf="@+id/seerView"
+                app:layout_constraintEnd_toStartOf="@+id/villagerNumber"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/villagerView"
+                app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
 
-        <ImageView
-            android:id="@+id/guardianNumberMinus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="54dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="130dp"
-            android:contentDescription="减少一个守卫"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/seerNumber"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/guardianView"
-            app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
+            <ImageView
+                android:id="@+id/wolfNumberMinus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="减少一个狼人"
+                app:layout_constraintBottom_toTopOf="@+id/witcherView"
+                app:layout_constraintEnd_toStartOf="@+id/wolfNumber"
+                app:layout_constraintStart_toEndOf="@+id/villagerNumberPlus"
+                app:layout_constraintTop_toBottomOf="@+id/wolfView"
+                app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
 
-        <ImageView
-            android:id="@+id/idiotNumberMinus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="34dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="130dp"
-            android:contentDescription="减少一个白痴"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/idiotNumber"
-            app:layout_constraintStart_toEndOf="@+id/guardianNumberPlus"
-            app:layout_constraintTop_toBottomOf="@+id/idiotView"
-            app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
+            <ImageView
+                android:id="@+id/seerNumberMinus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="减少一个预言家"
+                app:layout_constraintBottom_toTopOf="@+id/guardianView"
+                app:layout_constraintEnd_toStartOf="@+id/seerNumber"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seerView"
+                app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
 
-        <ImageView
-            android:id="@+id/villagerNumberPlus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="34dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="增加一个村民"
-            app:layout_constraintBottom_toTopOf="@+id/seerView"
-            app:layout_constraintEnd_toStartOf="@+id/wolfNumberMinus"
-            app:layout_constraintStart_toEndOf="@+id/villagerNumber"
-            app:layout_constraintTop_toBottomOf="@+id/villagerView"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
+            <ImageView
+                android:id="@+id/witcherNumberMinus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="减少一个女巫"
+                app:layout_constraintBottom_toTopOf="@+id/idiotView"
+                app:layout_constraintEnd_toStartOf="@+id/witcherNumber"
+                app:layout_constraintStart_toEndOf="@+id/seerNumberPlus"
+                app:layout_constraintTop_toBottomOf="@+id/witcherView"
+                app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
 
-        <ImageView
-            android:id="@+id/wolfNumberPlus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="54dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="增加一个狼人"
-            app:layout_constraintBottom_toTopOf="@+id/witcherView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/wolfNumber"
-            app:layout_constraintTop_toBottomOf="@+id/wolfView"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
+            <ImageView
+                android:id="@+id/guardianNumberMinus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="减少一个守卫"
+                app:layout_constraintBottom_toTopOf="@+id/hunterView"
+                app:layout_constraintEnd_toStartOf="@+id/guardianNumber"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/guardianView"
+                app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
 
-        <ImageView
-            android:id="@+id/seerNumberPlus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="34dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="增加一个预言家"
-            app:layout_constraintBottom_toTopOf="@+id/guardianView"
-            app:layout_constraintEnd_toStartOf="@+id/witcherNumberMinus"
-            app:layout_constraintStart_toEndOf="@+id/seerNumber"
-            app:layout_constraintTop_toBottomOf="@+id/seerView"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
+            <ImageView
+                android:id="@+id/idiotNumberMinus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="减少一个白痴"
+                app:layout_constraintBottom_toTopOf="@+id/wolfKingView"
+                app:layout_constraintEnd_toStartOf="@+id/idiotNumber"
+                app:layout_constraintStart_toEndOf="@+id/guardianNumberPlus"
+                app:layout_constraintTop_toBottomOf="@+id/idiotView"
+                app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
 
-        <ImageView
-            android:id="@+id/witcherNumberPlus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="54dp"
-            android:layout_marginBottom="16dp"
-            android:contentDescription="增加一个女巫"
-            app:layout_constraintBottom_toTopOf="@+id/idiotView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/witcherNumber"
-            app:layout_constraintTop_toBottomOf="@+id/witcherView"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
+            <ImageView
+                android:id="@+id/hunterNumberMinus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginBottom="40dp"
+                android:contentDescription="减少一个猎人"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/hunterNumber"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/hunterView"
+                app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
 
-        <ImageView
-            android:id="@+id/idiotNumberPlus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="54dp"
-            android:layout_marginBottom="130dp"
-            android:contentDescription="增加一个白痴"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/idiotNumber"
-            app:layout_constraintTop_toBottomOf="@+id/idiotView"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
+            <ImageView
+                android:id="@+id/wolfKingNumberMinus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginBottom="40dp"
+                android:contentDescription="减少一个狼王"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/wolfKingNumber"
+                app:layout_constraintStart_toEndOf="@+id/hunterNumberPlus"
+                app:layout_constraintTop_toBottomOf="@+id/wolfKingView"
+                app:srcCompat="@drawable/ic_baseline_horizontal_rule_24" />
 
-        <ImageView
-            android:id="@+id/guardianNumberPlus"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="34dp"
-            android:layout_marginBottom="130dp"
-            android:contentDescription="增加一个守卫"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/idiotNumberMinus"
-            app:layout_constraintStart_toEndOf="@+id/guardianNumber"
-            app:layout_constraintTop_toBottomOf="@+id/guardianView"
-            app:srcCompat="@drawable/ic_baseline_add_24" />
+            <ImageView
+                android:id="@+id/villagerNumberPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="增加一个村民"
+                app:layout_constraintBottom_toTopOf="@+id/seerView"
+                app:layout_constraintEnd_toStartOf="@+id/wolfNumberMinus"
+                app:layout_constraintStart_toEndOf="@+id/villagerNumber"
+                app:layout_constraintTop_toBottomOf="@+id/villagerView"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageView
+                android:id="@+id/wolfNumberPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="增加一个狼人"
+                app:layout_constraintBottom_toTopOf="@+id/witcherView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/wolfNumber"
+                app:layout_constraintTop_toBottomOf="@+id/wolfView"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
 
-</ScrollView>
+            <ImageView
+                android:id="@+id/seerNumberPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="增加一个预言家"
+                app:layout_constraintBottom_toTopOf="@+id/guardianView"
+                app:layout_constraintEnd_toStartOf="@+id/witcherNumberMinus"
+                app:layout_constraintStart_toEndOf="@+id/seerNumber"
+                app:layout_constraintTop_toBottomOf="@+id/seerView"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
+
+            <ImageView
+                android:id="@+id/witcherNumberPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="增加一个女巫"
+                app:layout_constraintBottom_toTopOf="@+id/idiotView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/witcherNumber"
+                app:layout_constraintTop_toBottomOf="@+id/witcherView"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
+
+            <ImageView
+                android:id="@+id/guardianNumberPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="增加一个守卫"
+                app:layout_constraintBottom_toTopOf="@+id/hunterView"
+                app:layout_constraintEnd_toStartOf="@+id/idiotNumberMinus"
+                app:layout_constraintStart_toEndOf="@+id/guardianNumber"
+                app:layout_constraintTop_toBottomOf="@+id/guardianView"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
+
+            <ImageView
+                android:id="@+id/idiotNumberPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="增加一个白痴"
+                app:layout_constraintBottom_toTopOf="@+id/wolfKingView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/idiotNumber"
+                app:layout_constraintTop_toBottomOf="@+id/idiotView"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
+
+            <ImageView
+                android:id="@+id/hunterNumberPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginBottom="40dp"
+                android:contentDescription="增加一个猎人"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/wolfKingNumberMinus"
+                app:layout_constraintStart_toEndOf="@+id/hunterNumber"
+                app:layout_constraintTop_toBottomOf="@+id/hunterView"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
+
+            <ImageView
+                android:id="@+id/wolfKingNumberPlus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginEnd="50dp"
+                android:layout_marginBottom="40dp"
+                android:contentDescription="增加一个狼王"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/wolfKingNumber"
+                app:layout_constraintTop_toBottomOf="@+id/wolfKingView"
+                app:srcCompat="@drawable/ic_baseline_add_24" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <Switch
+        android:id="@+id/switchMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="28dp"
+        android:text="@string/switch1"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/startGameButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/playerText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.053" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

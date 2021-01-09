@@ -7,10 +7,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Setting extends AppCompatActivity {
     private Button start;
+    private Switch switchButton;
 
     private View villagerMinus;
     private View villagerPlus;
@@ -24,6 +27,8 @@ public class Setting extends AppCompatActivity {
     private View guardianPlus;
     private View idiotMinus;
     private View idiotPlus;
+    private View hunterMinus;
+    private View hunterPlus;
 
     private TextView villagerNumber;
     private TextView wolfNumber;
@@ -31,6 +36,7 @@ public class Setting extends AppCompatActivity {
     private TextView witcherNumber;
     private TextView guardianNumber;
     private TextView idiotNumber;
+    private TextView hunterNumber;
 
     private int wolf;
     private int villagers;
@@ -38,9 +44,8 @@ public class Setting extends AppCompatActivity {
     private int witcher;
     private int guardian;
     private int idiot;
-
-    public Setting() {
-    }
+    private int hunter;
+    private Boolean mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,29 +59,41 @@ public class Setting extends AppCompatActivity {
             witcher = extras.getInt("witcher");
             guardian = extras.getInt("guardian");
             idiot = extras.getInt("idiot");
+            hunter = extras.getInt("hunter");
+            mode = extras.getBoolean("mode");
         }
 
-        start = (Button)findViewById(R.id.startGameButton);
+        start = findViewById(R.id.startGameButton);
 
-        start.setOnClickListener(new View.OnClickListener() {
+        start.setOnClickListener(view -> startGame());
+
+        switchButton = findViewById(R.id.switchMode);
+        setSwitch();
+
+        switchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startGame();
+                mode = !mode;
+                setSwitch();
             }
         });
 
-        villagerNumber = (TextView)findViewById(R.id.villagerNumber);
+        villagerNumber = findViewById(R.id.villagerNumber);
         villagerNumber.setText(Integer.toString(villagers));
-        wolfNumber = (TextView)findViewById(R.id.wolfNumber);
+        wolfNumber = findViewById(R.id.wolfNumber);
         wolfNumber.setText(Integer.toString(wolf));
-        seerNumber = (TextView)findViewById(R.id.seerNumber);
+        seerNumber = findViewById(R.id.seerNumber);
         seerNumber.setText(Integer.toString(seer));
-        witcherNumber = (TextView)findViewById(R.id.witcherNumber);
+        witcherNumber = findViewById(R.id.witcherNumber);
         witcherNumber.setText(Integer.toString(witcher));
-        guardianNumber = (TextView)findViewById(R.id.guardianNumber);
+        guardianNumber = findViewById(R.id.guardianNumber);
         guardianNumber.setText(Integer.toString(guardian));
-        idiotNumber = (TextView)findViewById(R.id.idiotNumber);
+        idiotNumber = findViewById(R.id.idiotNumber);
         idiotNumber.setText(Integer.toString(idiot));
+        hunterNumber = findViewById(R.id.hunterNumber);
+        hunterNumber.setText(Integer.toString(hunter));
+//        wolfKingNumber = findViewById(R.id.wolfKingNumber);
+//        wolfKingNumber.setText(Integer.toString(wolfKing));
 
         villagerMinus = findViewById(R.id.villagerNumberMinus);
         villagerMinus.setOnClickListener(new View.OnClickListener() {
@@ -133,7 +150,9 @@ public class Setting extends AppCompatActivity {
         seerPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                seer += 1;
+                if (seer < 1) {
+                    seer += 1;
+                }
                 seerNumber.setText(Integer.toString(seer));
             }
         });
@@ -153,7 +172,9 @@ public class Setting extends AppCompatActivity {
         witcherPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                witcher += 1;
+                if (witcher < 1) {
+                    witcher += 1;
+                }
                 witcherNumber.setText(Integer.toString(witcher));
             }
         });
@@ -173,7 +194,9 @@ public class Setting extends AppCompatActivity {
         guardianPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                guardian += 1;
+                if (guardian < 1) {
+                    guardian += 1;
+                }
                 guardianNumber.setText(Integer.toString(guardian));
             }
         });
@@ -193,8 +216,32 @@ public class Setting extends AppCompatActivity {
         idiotPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                idiot += 1;
+                if (idiot < 1) {
+                    idiot += 1;
+                }
                 idiotNumber.setText(Integer.toString(idiot));
+            }
+        });
+
+        hunterMinus = findViewById(R.id.hunterNumberMinus);
+        hunterMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (hunter > 0) {
+                    hunter -= 1;
+                }
+                hunterNumber.setText(Integer.toString(hunter));
+            }
+        });
+
+        hunterPlus = findViewById(R.id.hunterNumberPlus);
+        hunterPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (hunter < 1) {
+                    hunter += 1;
+                }
+                hunterNumber.setText(Integer.toString(hunter));
             }
         });
     }
@@ -207,6 +254,18 @@ public class Setting extends AppCompatActivity {
         assignCharacter.putExtra("witcher", witcher);
         assignCharacter.putExtra("guardian", guardian);
         assignCharacter.putExtra("idiot", idiot);
+        assignCharacter.putExtra("hunter", hunter);
+        assignCharacter.putExtra("mode", mode);
         startActivity(assignCharacter);
+    }
+
+    private void setSwitch(){
+        if (mode) {
+            switchButton.setChecked(true);
+            switchButton.setText(R.string.switch2);
+        } else {
+            switchButton.setChecked(false);
+            switchButton.setText(R.string.switch1);
+        }
     }
 }

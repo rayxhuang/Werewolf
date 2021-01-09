@@ -17,13 +17,15 @@ public class MainActivity extends AppCompatActivity {
     private int witcher = 0;
     private int guardian = 1;
     private int idiot = 0;
+    private int hunter = 0;
+    private Boolean mode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        start = (Button)findViewById(R.id.start_button);
+        start = findViewById(R.id.start_button);
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        setting = (Button)findViewById(R.id.settings_button);
+        setting = findViewById(R.id.settings_button);
 
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         assignCharacter.putExtra("witcher", witcher);
         assignCharacter.putExtra("guardian", guardian);
         assignCharacter.putExtra("idiot", idiot);
+        assignCharacter.putExtra("hunter", hunter);
+        assignCharacter.putExtra("mode", mode);
         startActivity(assignCharacter);
     }
 
@@ -61,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         changeSettings.putExtra("witcher", witcher);
         changeSettings.putExtra("guardian", guardian);
         changeSettings.putExtra("idiot", idiot);
+        changeSettings.putExtra("hunter", hunter);
+        changeSettings.putExtra("mode", mode);
         startActivity(changeSettings);
     }
 }

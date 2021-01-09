@@ -12,14 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import static com.example.werewolf.R.string.killTextLabel;
@@ -32,6 +28,8 @@ public class Night extends AppCompatActivity {
     private int witcher;
     private int guardian;
     private int idiot;
+    private int hunter;
+    private Boolean mode;
     private ArrayList<Integer> playerID;
     private ArrayList<String> assignedCharacterList;
     private Integer numPlayers;
@@ -50,16 +48,18 @@ public class Night extends AppCompatActivity {
     private Button witcherSaveButton;
     private Button witcherKillButton;
     private ImageView p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
+    private final ArrayList<ImageView> pCollection = new ArrayList<>(12);
+    private final ArrayList<Integer> cCollection = new ArrayList<>(12);
 
     private MediaPlayer mp;
 
-    private View.OnClickListener selectPlayer = new View.OnClickListener() {
+    private final View.OnClickListener selectPlayer = new View.OnClickListener() {
         public void onClick(View view) {
             currentSelectedPlayerID = selectedPlayerID;
             selectedPlayerID = Integer.parseInt((String) view.getContentDescription());
-            if (currentSelectedPlayerID == selectedPlayerID){
+            if (currentSelectedPlayerID.equals(selectedPlayerID)){
                 selectedPlayerID = 0;
-                Toast.makeText(Night.this, "你取消了选择", Toast.LENGTH_SHORT).show();
+                actionLabel.setText("你取消了选择");
                 if (currentCharacter.equals("Wolf")){
                     confirmButton.setEnabled(false);
                 }
@@ -75,10 +75,10 @@ public class Night extends AppCompatActivity {
                     witcherKillButton.setEnabled(false);
                 }
             } else {
-                Toast.makeText(Night.this, "你选择了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                actionLabel.setText("你选择了" + selectedPlayerID + "号玩家");
                 if (currentCharacter.equals("Witcher")){
                     if (witcherHoldsAntidote) {
-                        if (selectedPlayerID == intentKillPlayerID) {
+                        if (selectedPlayerID.equals(intentKillPlayerID)) {
                             if (selectedPlayerID - 1 != assignedCharacterList.indexOf("witcher")) {
                                 witcherSaveButton.setEnabled(true);
                             }
@@ -91,8 +91,8 @@ public class Night extends AppCompatActivity {
                     }
                 }
                 if (currentCharacter.equals("Guardian")){
-                    if (guardedPlayerID == selectedPlayerID) {
-                        Toast.makeText(Night.this, "你不能连续两晚守护同一玩家", Toast.LENGTH_SHORT).show();
+                    if (guardedPlayerID.equals(selectedPlayerID)) {
+                        actionLabel.setText("你不能连续两晚守护同一玩家");
                         selectedPlayerID = 0;
                         confirmButton.setText("跳过");
                     } else {
@@ -109,16 +109,16 @@ public class Night extends AppCompatActivity {
         }
     };
 
-    private View.OnClickListener confirmGuard = new View.OnClickListener() {
+    private final View.OnClickListener confirmGuard = new View.OnClickListener() {
         public void onClick(View view) {
             guardedPlayerID = selectedPlayerID;
             confirmButton.setEnabled(false);
-            makeClickable(false);
+            makeAllClickable(false);
             if (selectedPlayerID == 0){
-                Toast.makeText(Night.this, "你没有守护任何玩家", Toast.LENGTH_SHORT).show();
+                actionLabel.setText("你没有守护任何玩家");
                 writeToFile("守卫没有守护任何玩家\n", file);
             } else {
-                Toast.makeText(Night.this, "你守护了" + guardedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+                actionLabel.setText("你守护了" + guardedPlayerID + "号玩家");
                 writeToFile("守卫守护了" + guardedPlayerID + "号玩家\n", file);
             }
             currentSelectedPlayerID = 0;
@@ -128,31 +128,25 @@ public class Night extends AppCompatActivity {
                 mp.reset();
             }
             //Plays guardian finish audio
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mp = MediaPlayer.create(Night.this, R.raw.audio_guard_finish);
-                    mp.setOnCompletionListener(prepareForNext);
-                    mp.start();
-                }
+            new Handler().postDelayed(() -> {
+                mp = MediaPlayer.create(Night.this, R.raw.audio_guard_finish);
+                mp.setOnCompletionListener(prepareForNext);
+                mp.start();
             }, 2000);
 
             //Setup wolf
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setupWolf();
-                    makeClickable(true);
-                }
+            new Handler().postDelayed(() -> {
+                setupWolf();
+                makeAllClickable(true);
             }, 12000);
         }
     };
 
-    private View.OnClickListener confirmKill = new View.OnClickListener() {
+    private final View.OnClickListener confirmKill = new View.OnClickListener() {
         public void onClick(View view) {
             confirmButton.setEnabled(false);
-            makeClickable(false);
-            Toast.makeText(Night.this, "你杀害了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            makeAllClickable(false);
+            actionLabel.setText("你杀害了" + selectedPlayerID + "号玩家");
             writeToFile("狼人杀害了" + selectedPlayerID + "号玩家\n", file);
             intentKillPlayerID = selectedPlayerID;
             if (mp.isPlaying()) {
@@ -163,60 +157,51 @@ public class Night extends AppCompatActivity {
             selectedPlayerID = 0;
 
             //Plays wolf finish audio
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mp = MediaPlayer.create(Night.this, R.raw.audio_wolf_finish);
-                    mp.setOnCompletionListener(prepareForNext);
-                    mp.start();
-                    //Hide wolf card
-                    hideWolf();
-                    if (guardedPlayerID != intentKillPlayerID) {
-                        Integer won = judgeGame(false);
-                        if (won == 2){
-                            mp.release();
-                            Intent game = new Intent(Night.this, Game.class);
+            new Handler().postDelayed(() -> {
+                mp = MediaPlayer.create(Night.this, R.raw.audio_wolf_finish);
+                mp.setOnCompletionListener(prepareForNext);
+                mp.start();
+                //Hide wolf card
+                hideRevealed();
+                if (!guardedPlayerID.equals(intentKillPlayerID)) {
+                    Integer won = judgeGame(mode);
+                    if (won == 2){
+                        mp.release();
+                        Intent game = new Intent(Night.this, Game.class);
 
-                            game.putExtra("id", playerID);
-                            game.putExtra("characters", assignedCharacterList);
-                            game.putExtra("finished", true);
-                            game.putExtra("won", won);
-                            game.putExtra("wolf", wolf);
-                            game.putExtra("villagers", villagers);
-                            game.putExtra("seer", seer);
-                            game.putExtra("witcher", witcher);
-                            game.putExtra("guardian", guardian);
-                            game.putExtra("idiot", idiot);
+                        game.putExtra("id", playerID);
+                        game.putExtra("characters", assignedCharacterList);
+                        game.putExtra("finished", true);
+                        game.putExtra("won", won);
+                        game.putExtra("wolf", wolf);
+                        game.putExtra("villagers", villagers);
+                        game.putExtra("seer", seer);
+                        game.putExtra("witcher", witcher);
+                        game.putExtra("guardian", guardian);
+                        game.putExtra("idiot", idiot);
 
-                            startActivity(game);
-                        } else {
-                            //Setup seer
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setupSeer();
-                                    makeClickable(true);
-                                }
-                            }, 9000);
-                        }
+                        startActivity(game);
                     } else {
                         //Setup seer
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                setupSeer();
-                                makeClickable(true);
-                            }
+                        new Handler().postDelayed(() -> {
+                            makeAllClickable(true);
+                            setupSeer();
                         }, 9000);
                     }
+                } else {
+                    //Setup seer
+                    new Handler().postDelayed(() -> {
+                        makeAllClickable(true);
+                        setupSeer();
+                    }, 9000);
                 }
             }, 3000);
         }
     };
 
-    private View.OnClickListener confirmSave = new View.OnClickListener() {
+    private final View.OnClickListener confirmSave = new View.OnClickListener() {
         public void onClick(View view) {
-            Toast.makeText(Night.this, "你解救了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            actionLabel.setText("你解救了" + selectedPlayerID + "号玩家");
             writeToFile("女巫解救了" + selectedPlayerID + "号玩家\n", file);
             if (mp.isPlaying()) {
                 mp.stop();
@@ -228,15 +213,15 @@ public class Night extends AppCompatActivity {
             witcherSaveButton.setEnabled(false);
             witcherKillButton.setEnabled(false);
             confirmButton.setEnabled(false);
-            makeClickable(false);
+            makeAllClickable(false);
             antidotePlayerID = intentKillPlayerID;
             finishWitcher();
         }
     };
 
-    private View.OnClickListener witcherSkip = new View.OnClickListener() {
+    private final View.OnClickListener witcherSkip = new View.OnClickListener() {
         public void onClick(View view) {
-            Toast.makeText(Night.this, "你没有进行操作", Toast.LENGTH_SHORT).show();
+            actionLabel.setText("你没有进行操作");
             writeToFile("女巫没有进行操作\n", file);
             if (mp.isPlaying()) {
                 mp.stop();
@@ -247,14 +232,14 @@ public class Night extends AppCompatActivity {
             confirmButton.setEnabled(false);
             witcherSaveButton.setEnabled(false);
             witcherKillButton.setEnabled(false);
-            makeClickable(false);
+            makeAllClickable(false);
             finishWitcher();
         }
     };
 
-    private View.OnClickListener confirmPoison = new View.OnClickListener() {
+    private final View.OnClickListener confirmPoison = new View.OnClickListener() {
         public void onClick(View view) {
-            Toast.makeText(Night.this, "你毒死了" + selectedPlayerID + "号玩家", Toast.LENGTH_SHORT).show();
+            actionLabel.setText("你毒死了" + selectedPlayerID + "号玩家");
             writeToFile("女巫毒死了" + selectedPlayerID + "号玩家\n", file);
             if (mp.isPlaying()) {
                 mp.stop();
@@ -267,78 +252,62 @@ public class Night extends AppCompatActivity {
             confirmButton.setEnabled(false);
             witcherSaveButton.setEnabled(false);
             witcherKillButton.setEnabled(false);
-            makeClickable(false);
+            makeAllClickable(false);
             finishWitcher();
         }
     };
 
-    private View.OnClickListener confirmSeek = new View.OnClickListener() {
+    private final View.OnClickListener confirmSeek = new View.OnClickListener() {
         public void onClick(View view) {
             confirmButton.setEnabled(false);
-            makeClickable(false);
+            makeAllClickable(false);
             if (selectedPlayerID != 0) {
                 String character = assignedCharacterList.get(selectedPlayerID - 1);
-                Boolean goodCharacter = true;
+                boolean goodCharacter = true;
                 String characterLabel = "好人";
-                switch (character) {
-                    case "wolf":
-                        goodCharacter = false;
-                        characterLabel = "坏人";
+                if ("wolf".equals(character)) {
+                    goodCharacter = false;
+                    characterLabel = "狼人";
                 }
-                Toast.makeText(Night.this, selectedPlayerID + "号玩家是" + characterLabel, Toast.LENGTH_SHORT).show();
+                actionLabel.setText(selectedPlayerID + "号玩家是" + characterLabel);
                 writeToFile("预言家查验了" + selectedPlayerID + "号玩家\n", file);
                 showCharacter(goodCharacter, selectedPlayerID);
             } else {
-                Toast.makeText(Night.this, "你没有查验任何人", Toast.LENGTH_SHORT).show();
+                actionLabel.setText("你没有查验任何人");
                 writeToFile("预言家没有查验任何玩家\n", file);
             }
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
             //Plays seer finish audio
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (mp.isPlaying()) {
-                        mp.stop();
-                        mp.reset();
-                    }
-                    hideWolf();
-                    mp = MediaPlayer.create(Night.this, R.raw.audio_seer_finish);
-                    mp.setOnCompletionListener(prepareForNext);
-                    mp.start();
+            new Handler().postDelayed(() -> {
+                if (mp.isPlaying()) {
+                    mp.stop();
+                    mp.reset();
                 }
+                hideRevealed();
+                mp = MediaPlayer.create(Night.this, R.raw.audio_seer_finish);
+                mp.setOnCompletionListener(prepareForNext);
+                mp.start();
             }, 3000);
 
             if (assignedCharacterList.contains("witcher")) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (assignedCharacterList.contains("witcher")){
-                            setupWitcher();
-                            makeClickable(true);
-                        }
-                        //
+                new Handler().postDelayed(() -> {
+                    if (assignedCharacterList.contains("witcher")){
+                        makeAllClickable(true);
+                        setupWitcher();
                     }
+                    //
                 }, 12000);
             } else {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        finishNight();
-                    }
-                }, 12000);
+                new Handler().postDelayed(() -> finishNight(), 12000);
             }
 
         }
     };
 
-    private MediaPlayer.OnCompletionListener prepareForNext = new MediaPlayer.OnCompletionListener() {
-        @Override
-        public void onCompletion(MediaPlayer mp) {
-//            Toast.makeText(Wolf.this, "Audi playback finished, this is auto stop", Toast.LENGTH_SHORT).show();
-            mp.stop();
-            mp.reset();
-        }
+    private final MediaPlayer.OnCompletionListener prepareForNext = mp -> {
+        mp.stop();
+        mp.reset();
     };
 
     @Override
@@ -347,57 +316,38 @@ public class Night extends AppCompatActivity {
         setContentView(R.layout.activity_night);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            wolf = extras.getInt("wolf");
-            villagers = extras.getInt("villagers");
-            seer = extras.getInt("seer");
-            witcher = extras.getInt("witcher");
-            guardian = extras.getInt("guardian");
-            idiot = extras.getInt("idiot");
-            playerID = (ArrayList<Integer>) getIntent().getSerializableExtra("id");
-            assignedCharacterList = (ArrayList<String>) getIntent().getSerializableExtra("characters");
-            numPlayers = (Integer) extras.get("numPlayers");
-            alive = (ArrayList<Boolean>) getIntent().getSerializableExtra("alive");
-            guardedPlayerID = (Integer) extras.get("guardedPlayerID");
-            intentKillPlayerID = (Integer) extras.get("intentKillPlayerID");
-            antidotePlayerID = (Integer) extras.get("antidotePlayerID");
-            poisonPlayerID = (Integer) extras.get("poisonPlayerID");
-            witcherHoldsAntidote = (Boolean) extras.get("witcherHoldsAntidote");
-            witcherHoldsPoison = (Boolean) extras.get("witcherHoldsPoison");
-            file = (File) extras.get("file");
+            //Get extras
+            getExtras(extras);
+            //Initialise
+            init();
         }
-        writeToFile("==========\n", file);
-        writeToFile("天黑了\n", file);
-        init();
 
         //Night starts...
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mp = MediaPlayer.create(Night.this, R.raw.audio_night_start);
-                mp.setOnCompletionListener(prepareForNext);
-                mp.start();
-            }
+        new Handler().postDelayed(() -> {
+            mp = MediaPlayer.create(Night.this, R.raw.audio_night_start);
+            mp.setOnCompletionListener(prepareForNext);
+            mp.start();
         }, 2000);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                makeCardVisible();
-                if (assignedCharacterList.contains("guardian")){
-                    setupGuardian();
-                } else {
-                    setupWolf();
-                }
+        //Setup different characters
+        new Handler().postDelayed(() -> {
+            makeCardVisible();
+            if (assignedCharacterList.contains("guardian")){
+                setupGuardian();
+            } else {
+                setupWolf();
             }
-        }, 10000);
-
+        }, 7000);
     }
 
+    //This function initialises Night.class
     private void init() {
         actionLabel = findViewById(R.id.actionLabel);
         actionLabel.setText("天黑请闭眼");
         confirmButton = findViewById(R.id.confirmButton);
         confirmButton.setEnabled(false);
+        writeToFile("==========\n", file);
+        writeToFile("天黑了\n", file);
         witcherSaveButton = findViewById(R.id.saveButton);
         witcherKillButton = findViewById(R.id.killButton);
 
@@ -414,363 +364,111 @@ public class Night extends AppCompatActivity {
         p11 = findViewById(R.id.pCard11);
         p12 = findViewById(R.id.pCard12);
 
+        pCollection.add(p1);
+        pCollection.add(p2);
+        pCollection.add(p3);
+        pCollection.add(p4);
+        pCollection.add(p5);
+        pCollection.add(p6);
+        pCollection.add(p7);
+        pCollection.add(p8);
+        pCollection.add(p9);
+        pCollection.add(p10);
+        pCollection.add(p11);
+        pCollection.add(p12);
 
-        for (int i = 0; i < 12; i++){
+        //This loop makes unassigned player card transparent
+        //Sets onClickListener to assigned player card
+        //Displays dead player card and make it unclickable
+        for (int i = 0; i < pCollection.size(); i++){
             if (assignedCharacterList.get(i).equals("None")){
                 makeTransparent(i);
             }
-        }
-
-        for (int i = 1; i < 13; i++) {
-            switch (i){
-                case 1:
-                    p1.setVisibility(View.GONE);
-                    p1.setOnClickListener(selectPlayer);
-                    if (alive.get(i - 1) == false) {
-                        p1.setClickable(false);
-                        updateDeadCard(i - 1);
-                    }
-                    break;
-                case 2:
-                    p2.setVisibility(View.GONE);
-                    p2.setOnClickListener(selectPlayer);
-                    if (alive.get(i - 1) == false) {
-                        p2.setClickable(false);
-                        updateDeadCard(i - 1);
-                    }
-                    break;
-                case 3:
-                    p3.setVisibility(View.GONE);
-                    p3.setOnClickListener(selectPlayer);
-                    if (alive.get(i - 1) == false) {
-                        p3.setClickable(false);
-                        updateDeadCard(i - 1);
-                    }
-                    break;
-                case 4:
-                    p4.setVisibility(View.GONE);
-                    p4.setOnClickListener(selectPlayer);
-                    if (alive.get(i - 1) == false) {
-                        p4.setClickable(false);
-                        updateDeadCard(i - 1);
-                    }
-                    break;
-                case 5:
-                    p5.setVisibility(View.GONE);
-                    if (i <= numPlayers) {
-                        p5.setOnClickListener(selectPlayer);
-                        if (alive.get(i - 1) == false) {
-                            p5.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 6:
-                    p6.setVisibility(View.GONE);
-                    if (i <= numPlayers) {
-                        p6.setOnClickListener(selectPlayer);
-                        if (alive.get(i - 1) == false) {
-                            p6.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 7:
-                    p7.setVisibility(View.GONE);
-                    if (i <= numPlayers) {
-                        p7.setOnClickListener(selectPlayer);
-                        if (alive.get(i - 1) == false) {
-                            p7.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 8:
-                    p8.setVisibility(View.GONE);
-                    if (i <= numPlayers) {
-                        p8.setOnClickListener(selectPlayer);
-                        if (alive.get(i - 1) == false) {
-                            p8.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 9:
-                    p9.setVisibility(View.GONE);
-                    if (i <= numPlayers) {
-                        p9.setOnClickListener(selectPlayer);
-                        if (alive.get(i - 1) == false) {
-                            p9.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 10:
-                    p10.setVisibility(View.GONE);
-                    if (i <= numPlayers) {
-                        p10.setOnClickListener(selectPlayer);
-                        if (alive.get(i - 1) == false) {
-                            p10.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 11:
-                    p11.setVisibility(View.GONE);
-                    if (i <= numPlayers) {
-                        p11.setOnClickListener(selectPlayer);
-                        if (alive.get(i - 1) == false) {
-                            p11.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 12:
-                    p12.setVisibility(View.GONE);
-                    if (i <= numPlayers) {
-                        p12.setOnClickListener(selectPlayer);
-                        if (alive.get(i - 1) == false) {
-                            p12.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
+            ImageView card = pCollection.get(i);
+            card.setVisibility(View.GONE);
+            if (i < numPlayers) {
+                card.setOnClickListener(selectPlayer);
+                if (alive.get(i).equals(false)) {
+                    card.setClickable(false);
+                    updateDeadCard(i);
+                }
             }
         }
+
+        //This stores resource ids in an array for later use
+        cCollection.add(R.drawable.card_back1);
+        cCollection.add(R.drawable.card_back2);
+        cCollection.add(R.drawable.card_back3);
+        cCollection.add(R.drawable.card_back4);
+        cCollection.add(R.drawable.card_back5);
+        cCollection.add(R.drawable.card_back6);
+        cCollection.add(R.drawable.card_back7);
+        cCollection.add(R.drawable.card_back8);
+        cCollection.add(R.drawable.card_back9);
+        cCollection.add(R.drawable.card_back10);
+        cCollection.add(R.drawable.card_back11);
+        cCollection.add(R.drawable.card_back12);
     }
 
+    //This function gets all the extras and set them to the field
+    private void getExtras(Bundle extras){
+        wolf = extras.getInt("wolf");
+        villagers = extras.getInt("villagers");
+        seer = extras.getInt("seer");
+        witcher = extras.getInt("witcher");
+        guardian = extras.getInt("guardian");
+        idiot = extras.getInt("idiot");
+        hunter = extras.getInt("hunter");
+        mode = extras.getBoolean("mode");
+        playerID = (ArrayList<Integer>) extras.get("id");
+        assignedCharacterList = (ArrayList<String>) extras.get("characters");
+        numPlayers = (Integer) extras.get("numPlayers");
+        alive = (ArrayList<Boolean>) extras.get("alive");
+        guardedPlayerID = (Integer) extras.get("guardedPlayerID");
+        intentKillPlayerID = (Integer) extras.get("intentKillPlayerID");
+        antidotePlayerID = (Integer) extras.get("antidotePlayerID");
+        poisonPlayerID = (Integer) extras.get("poisonPlayerID");
+        witcherHoldsAntidote = (Boolean) extras.get("witcherHoldsAntidote");
+        witcherHoldsPoison = (Boolean) extras.get("witcherHoldsPoison");
+        file = (File) extras.get("file");
+    }
+
+    //This function makes all card visible
     private void makeCardVisible () {
-        p1.setVisibility(View.VISIBLE);
-        p2.setVisibility(View.VISIBLE);
-        p3.setVisibility(View.VISIBLE);
-        p4.setVisibility(View.VISIBLE);
-        p5.setVisibility(View.VISIBLE);
-        p6.setVisibility(View.VISIBLE);
-        p7.setVisibility(View.VISIBLE);
-        p8.setVisibility(View.VISIBLE);
-        p9.setVisibility(View.VISIBLE);
-        p10.setVisibility(View.VISIBLE);
-        p11.setVisibility(View.VISIBLE);
-        p12.setVisibility(View.VISIBLE);
-    }
-
-    private void makeTransparent(int i) {
-        switch (i) {
-            case 4:
-                p5.setImageResource(R.drawable.transparent);
-                break;
-            case 5:
-                p6.setImageResource(R.drawable.transparent);
-                break;
-            case 6:
-                p7.setImageResource(R.drawable.transparent);
-                break;
-            case 7:
-                p8.setImageResource(R.drawable.transparent);
-                break;
-            case 8:
-                p9.setImageResource(R.drawable.transparent);
-                break;
-            case 9:
-                p10.setImageResource(R.drawable.transparent);
-                break;
-            case 10:
-                p11.setImageResource(R.drawable.transparent);
-                break;
-            case 11:
-                p12.setImageResource(R.drawable.transparent);
-                break;
+        for (int i = 0; i < pCollection.size(); i++) {
+            pCollection.get(i).setVisibility(View.VISIBLE);
         }
     }
 
-    //Toggle all cards' clickable status
-    private void makeClickable(Boolean t) {
-        p1.setClickable(t);
-        p2.setClickable(t);
-        p3.setClickable(t);
-        p4.setClickable(t);
-        p5.setClickable(t);
-        p6.setClickable(t);
-        p7.setClickable(t);
-        p8.setClickable(t);
-        p9.setClickable(t);
-        p10.setClickable(t);
-        p11.setClickable(t);
-        p12.setClickable(t);
+    //This function makes a player's card transparent
+    private void makeTransparent(int i) {
+        pCollection.get(i).setImageResource(R.drawable.transparent);
     }
 
-    private void makeUnClickable() {
-        for (int i = 1; i < 13; i++) {
-            switch (i){
-                case 1:
-                    if (alive.get(i - 1) == false) {
-                        p1.setClickable(false);
-                        updateDeadCard(i - 1);
-                    }
-                    break;
-                case 2:
-                    if (alive.get(i - 1) == false) {
-                        p2.setClickable(false);
-                        updateDeadCard(i - 1);
-                    }
-                    break;
-                case 3:
-                    if (alive.get(i - 1) == false) {
-                        p3.setClickable(false);
-                        updateDeadCard(i - 1);
-                    }
-                    break;
-                case 4:
-                    if (alive.get(i - 1) == false) {
-                        p4.setClickable(false);
-                        updateDeadCard(i - 1);
-                    }
-                    break;
-                case 5:
-                    if (i <= numPlayers) {
-                        if (alive.get(i - 1) == false) {
-                            p5.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 6:
-                    if (i <= numPlayers) {
-                        if (alive.get(i - 1) == false) {
-                            p6.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 7:
-                    if (i <= numPlayers) {
-                        if (alive.get(i - 1) == false) {
-                            p7.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 8:
-                    if (i <= numPlayers) {
-                        if (alive.get(i - 1) == false) {
-                            p8.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 9:
-                    if (i <= numPlayers) {
-                        if (alive.get(i - 1) == false) {
-                            p9.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 10:
-                    if (i <= numPlayers) {
-                        if (alive.get(i - 1) == false) {
-                            p10.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 11:
-                    if (i <= numPlayers) {
-                        if (alive.get(i - 1) == false) {
-                            p11.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
-                case 12:
-                    if (i <= numPlayers) {
-                        if (alive.get(i - 1) == false) {
-                            p12.setClickable(false);
-                            updateDeadCard(i - 1);
-                        }
-                    }
-                    break;
+    //This function toggles all cards' clickable status
+    private void makeAllClickable(Boolean t) {
+        for (int i = 0; i < pCollection.size(); i++) {
+            pCollection.get(i).setClickable(t);
+        }
+    }
+
+    //This function makes dead player's card unclickable
+    private void makeDeadCardUnClickable() {
+        for (int i = 0; i < numPlayers; i++) {
+            ImageView card = pCollection.get(i);
+            if (alive.get(i).equals(false)) {
+                card.setClickable(false);
+                updateDeadCard(i);
             }
         }
     }
 
+    //This function makes a player's card to display dead status
     private void updateDeadCard(int i) {
-        switch (i) {
-            case 0:
-                if (alive.get(i) == false) {
-                    p1.setImageResource(R.drawable.card_back_dead);
-                    p1.setClickable(false);
-                }
-                break;
-            case 1:
-                if (alive.get(i) == false) {
-                    p2.setImageResource(R.drawable.card_back_dead);
-                    p2.setClickable(false);
-                }
-                break;
-            case 2:
-                if (alive.get(i) == false) {
-                    p3.setImageResource(R.drawable.card_back_dead);
-                    p3.setClickable(false);
-                }
-                break;
-            case 3:
-                if (alive.get(i) == false) {
-                    p4.setImageResource(R.drawable.card_back_dead);
-                    p4.setClickable(false);
-                }
-                break;
-            case 4:
-                if (alive.get(i) == false) {
-                    p5.setImageResource(R.drawable.card_back_dead);
-                    p5.setClickable(false);
-                }
-                break;
-            case 5:
-                if (alive.get(i) == false) {
-                    p6.setImageResource(R.drawable.card_back_dead);
-                    p6.setClickable(false);
-                }
-                break;
-            case 6:
-                if (alive.get(i) == false) {
-                    p7.setImageResource(R.drawable.card_back_dead);
-                    p7.setClickable(false);
-                }
-                break;
-            case 7:
-                if (alive.get(i) == false) {
-                    p8.setImageResource(R.drawable.card_back_dead);
-                    p8.setClickable(false);
-                }
-                break;
-            case 8:
-                if (alive.get(i) == false) {
-                    p9.setImageResource(R.drawable.card_back_dead);
-                    p9.setClickable(false);
-                }
-                break;
-            case 9:
-                if (alive.get(i) == false) {
-                    p10.setImageResource(R.drawable.card_back_dead);
-                    p10.setClickable(false);
-                }
-                break;
-            case 10:
-                if (alive.get(i) == false) {
-                    p11.setImageResource(R.drawable.card_back_dead);
-                    p11.setClickable(false);
-                }
-                break;
-            case 11:
-                if (alive.get(i) == false) {
-                    p12.setImageResource(R.drawable.card_back_dead);
-                    p12.setClickable(false);
-                }
-                break;
-        }
+        pCollection.get(i).setImageResource(R.drawable.card_back_dead);
     }
 
+    //This function setup Guardian
     private void setupGuardian() {
         currentCharacter = "Guardian";
         actionLabel.setText(R.string.guardTextLabel);
@@ -782,159 +480,43 @@ public class Night extends AppCompatActivity {
         mp.start();
     }
 
+    //This function setup Wolf
     private void setupWolf() {
         currentCharacter = "Wolf";
         actionLabel.setText(killTextLabel);
         confirmButton.setText("杀害");
+        //Wolf has to kill someone, cannot skip, but he can kill a dead body
         confirmButton.setEnabled(false);
         confirmButton.setOnClickListener(confirmKill);
-        makeClickable(true);
+        makeAllClickable(true);
         mp = MediaPlayer.create(Night.this, R.raw.audio_wolf_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                showWolfMate();
-            }
-        }, 3000);
+
+        //Reveal all wolves
+        new Handler().postDelayed(this::showWolfMate, 2000);
     }
 
+    //This function replaces player's card with wolf if his assigned character is wolf
     private void showWolfMate() {
         for (int i = 0; i < numPlayers; i++) {
             if (assignedCharacterList.get(i).equals("wolf")) {
-                switch (i) {
-                    case 0:
-                        if (alive.get(i) == true) {
-                            p1.setImageResource(R.drawable.wolf);
-                        } else {
-                            p1.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 1:
-                        if (alive.get(i) == true) {
-                            p2.setImageResource(R.drawable.wolf);
-                        } else {
-                            p2.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 2:
-                        if (alive.get(i) == true) {
-                            p3.setImageResource(R.drawable.wolf);
-                        } else {
-                            p3.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 3:
-                        if (alive.get(i) == true) {
-                            p4.setImageResource(R.drawable.wolf);
-                        } else {
-                            p4.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 4:
-                        if (alive.get(i) == true) {
-                            p5.setImageResource(R.drawable.wolf);
-                        } else {
-                            p5.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 5:
-                        if (alive.get(i) == true) {
-                            p6.setImageResource(R.drawable.wolf);
-                        } else {
-                            p6.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 6:
-                        if (alive.get(i) == true) {
-                            p7.setImageResource(R.drawable.wolf);
-                        } else {
-                            p7.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 7:
-                        if (alive.get(i) == true) {
-                            p8.setImageResource(R.drawable.wolf);
-                        } else {
-                            p8.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 8:
-                        if (alive.get(i) == true) {
-                            p9.setImageResource(R.drawable.wolf);
-                        } else {
-                            p9.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 9:
-                        if (alive.get(i) == true) {
-                            p10.setImageResource(R.drawable.wolf);
-                        } else {
-                            p10.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 10:
-                        if (alive.get(i) == true) {
-                            p11.setImageResource(R.drawable.wolf);
-                        } else {
-                            p11.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
-                    case 11:
-                        if (alive.get(i) == true) {
-                            p12.setImageResource(R.drawable.wolf);
-                        } else {
-                            p12.setImageResource(R.drawable.wolf_dead);
-                        }
-                        break;
+                ImageView card = pCollection.get(i);
+                if (alive.get(i)) {
+                    card.setImageResource(R.drawable.wolf);
+                } else {
+                    card.setImageResource(R.drawable.wolf_dead);
                 }
             }
         }
     }
 
-    private void hideWolf() {
+    //This function replaces all assigned cards back to original numbered card
+    private void hideRevealed() {
         for (int i = 0; i < numPlayers; i++) {
-            switch (i) {
-                case 0:
-                    p1.setImageResource(R.drawable.card_back1);
-                    break;
-                case 1:
-                    p2.setImageResource(R.drawable.card_back2);
-                    break;
-                case 2:
-                    p3.setImageResource(R.drawable.card_back3);
-                    break;
-                case 3:
-                    p4.setImageResource(R.drawable.card_back4);
-                    break;
-                case 4:
-                    p5.setImageResource(R.drawable.card_back5);
-                    break;
-                case 5:
-                    p6.setImageResource(R.drawable.card_back6);
-                    break;
-                case 6:
-                    p7.setImageResource(R.drawable.card_back7);
-                    break;
-                case 7:
-                    p8.setImageResource(R.drawable.card_back8);
-                    break;
-                case 8:
-                    p9.setImageResource(R.drawable.card_back9);
-                    break;
-                case 9:
-                    p10.setImageResource(R.drawable.card_back10);
-                    break;
-                case 10:
-                    p11.setImageResource(R.drawable.card_back11);
-                    break;
-                case 11:
-                    p12.setImageResource(R.drawable.card_back12);
-                    break;
-            }
+            pCollection.get(i).setImageResource(cCollection.get(i));
         }
-        makeUnClickable();
+        makeDeadCardUnClickable();
     }
 
     private void setupSeer() {
@@ -944,7 +526,7 @@ public class Night extends AppCompatActivity {
         confirmButton.setEnabled(true);
         confirmButton.setOnClickListener(confirmSeek);
         actionLabel.setText(R.string.seerTextLabel);
-        makeUnClickable();
+        makeDeadCardUnClickable();
         mp = MediaPlayer.create(Night.this, R.raw.audio_seer_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
@@ -1058,28 +640,20 @@ public class Night extends AppCompatActivity {
 
     private void finishWitcher() {
         //Plays witcher finish audio
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mp = MediaPlayer.create(Night.this, R.raw.audio_witcher_finish);
-                mp.setOnCompletionListener(prepareForNext);
-                mp.start();
-                hideWolf();
-                confirmButton.setEnabled(false);
-                witcherSaveButton.setVisibility(View.GONE);
-                witcherKillButton.setVisibility(View.GONE);
-                witcherSaveButton.setEnabled(false);
-                witcherKillButton.setEnabled(false);
-            }
+        new Handler().postDelayed(() -> {
+            mp = MediaPlayer.create(Night.this, R.raw.audio_witcher_finish);
+            mp.setOnCompletionListener(prepareForNext);
+            mp.start();
+            hideRevealed();
+            confirmButton.setEnabled(false);
+            witcherSaveButton.setVisibility(View.GONE);
+            witcherKillButton.setVisibility(View.GONE);
+            witcherSaveButton.setEnabled(false);
+            witcherKillButton.setEnabled(false);
         }, 2000);
 
         //Setup next
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                finishNight();
-            }
-        }, 12000);
+        new Handler().postDelayed(this::finishNight, 12000);
     }
 
     private void finishNight(){
@@ -1102,6 +676,8 @@ public class Night extends AppCompatActivity {
         day.putExtra("witcher", witcher);
         day.putExtra("guardian", guardian);
         day.putExtra("idiot", idiot);
+        day.putExtra("hunter", hunter);
+        day.putExtra("mode", mode);
         day.putExtra("file", file);
         startActivity(day);
     }
@@ -1110,22 +686,17 @@ public class Night extends AppCompatActivity {
         //0 stands for undecided victory
         //2 stands for werewolf victory
         if (assignedCharacterList.contains("witcher") && witcherHoldsAntidote.equals(true)) {return 0;}
-        ArrayList<Boolean> intentAlive = new ArrayList<Boolean>(alive);
+        ArrayList<Boolean> intentAlive = new ArrayList<>(alive);
         intentAlive.set(intentKillPlayerID - 1, false);
-        Integer totalGod = 0, totalVillager = 0, totalWolf = 0;
-        Integer aliveGod = 0, aliveVillager = 0, aliveWolf = 0;
+        int aliveGod = 0, aliveVillager = 0;
         for (int i = 0; i < numPlayers; i++) {
             switch (assignedCharacterList.get(i)) {
                 case "wolf":
-                    totalWolf += 1;
-                    if (intentAlive.get(i).equals(true)) {aliveWolf += 1;}
                     break;
                 case "villager":
-                    totalVillager += 1;
                     if (intentAlive.get(i).equals(true)) {aliveVillager += 1;}
                     break;
                 default:
-                    totalGod += 1;
                     if (intentAlive.get(i).equals(true)) {aliveGod += 1;}
                     break;
             }

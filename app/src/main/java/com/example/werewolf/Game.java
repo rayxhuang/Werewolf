@@ -2,7 +2,6 @@ package com.example.werewolf;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 
@@ -10,20 +9,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class Game extends AppCompatActivity {
@@ -54,6 +47,8 @@ public class Game extends AppCompatActivity {
     private int witcher;
     private int guardian;
     private int idiot;
+    private int hunter;
+    private Boolean mode;
 
     private View.OnClickListener startAgain = new View.OnClickListener() {
         public void onClick(View view) {
@@ -64,6 +59,7 @@ public class Game extends AppCompatActivity {
             assignCharacter.putExtra("witcher", witcher);
             assignCharacter.putExtra("guardian", guardian);
             assignCharacter.putExtra("idiot", idiot);
+            assignCharacter.putExtra("mode", mode);
             startActivity(assignCharacter);
         }
     };
@@ -77,6 +73,8 @@ public class Game extends AppCompatActivity {
             changeSettings.putExtra("witcher", witcher);
             changeSettings.putExtra("guardian", guardian);
             changeSettings.putExtra("idiot", idiot);
+            changeSettings.putExtra("hunter", hunter);
+            changeSettings.putExtra("mode", mode);
             startActivity(changeSettings);
         }
     };
@@ -164,6 +162,8 @@ public class Game extends AppCompatActivity {
             witcher = extras.getInt("witcher");
             guardian = extras.getInt("guardian");
             idiot = extras.getInt("idiot");
+            hunter = extras.getInt("hunter");
+            mode = extras.getBoolean("mode");
 
             if (finished) {
                 logText.setVisibility(View.VISIBLE);
@@ -228,6 +228,8 @@ public class Game extends AppCompatActivity {
                     night.putExtra("witcher", witcher);
                     night.putExtra("guardian", guardian);
                     night.putExtra("idiot", idiot);
+                    night.putExtra("hunter", hunter);
+                    night.putExtra("mode", mode);
                     night.putExtra("file", file2);
                     startActivity(night);
                 }

@@ -9,6 +9,7 @@
     <string name="character_description_witcher">女巫</string>
     <string name="character_description_guardian">守卫</string>
     <string name="character_description_idoit">白痴</string>
+    <string name="character_description_hunter">猎人</string>
     <string name="title_activity_player_info">狼人杀</string>
     <!--
     This string is used for square devices and overridden by hello_world in
@@ -38,4 +39,7 @@
     <string name="confirmButtonLabel">确认</string>
     <string name="witcherSaveButtonTextLabel">使用解药</string>
     <string name="witcherKillButtonTextLabel">使用毒药</string>
+    <string name="character_description_wolf_king">狼王</string>
+    <string name="switch1">屠边</string>
+    <string name="switch2">屠城</string>
 </resources>

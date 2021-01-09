@@ -2,17 +2,15 @@ package com.example.werewolf;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class SetPlayerCharacter extends AppCompatActivity {
@@ -23,53 +21,53 @@ public class SetPlayerCharacter extends AppCompatActivity {
     private int witcher;
     private int guardian;
     private int idiot;
+    private int hunter;
+    private Boolean mode;
 
     private TextView playerLabel;
     private ImageView cCard;
     private Button next;
     private int playerViewIndex = 1;
-    private View.OnClickListener setBack = new View.OnClickListener() {
+
+    private ArrayList<String> assignedCharacterList;
+    private ArrayList<Integer> playerID;
+
+    private final View.OnClickListener setBack = new View.OnClickListener() {
         public void onClick(View view) {
             cCard.setImageResource(R.drawable.card_back);
             cCard.setOnClickListener(seeCard);
         }
     };
 
-    private View.OnClickListener seeCard = new View.OnClickListener() {
+    private final View.OnClickListener seeCard = new View.OnClickListener() {
         public void onClick(View view) {
             next.setEnabled(true);
             String c = assignedCharacterList.get(playerViewIndex - 1);
             switch(c) {
                 case "villager":
                     cCard.setImageResource(R.drawable.villager);
-                    cCard.setOnClickListener(setBack);
                     break;
                 case "wolf":
                     cCard.setImageResource(R.drawable.wolf);
-                    cCard.setOnClickListener(setBack);
                     break;
                 case "seer":
                     cCard.setImageResource(R.drawable.seer);
-                    cCard.setOnClickListener(setBack);
                     break;
                 case "witcher":
                     cCard.setImageResource(R.drawable.witcher);
-                    cCard.setOnClickListener(setBack);
                     break;
                 case "guardian":
                     cCard.setImageResource(R.drawable.guardian);
-                    cCard.setOnClickListener(setBack);
                     break;
                 case "idiot":
                     cCard.setImageResource(R.drawable.idiot);
-                    cCard.setOnClickListener(setBack);
                     break;
+                case "hunter":
+                    cCard.setImageResource(R.drawable.hunter);
             }
+            cCard.setOnClickListener(setBack);
         }
     };
-
-    private ArrayList<String> assignedCharacterList;
-    private ArrayList<Integer> playerID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +81,9 @@ public class SetPlayerCharacter extends AppCompatActivity {
             witcher = extras.getInt("witcher");
             guardian = extras.getInt("guardian");
             idiot = extras.getInt("idiot");
-            totalPlayers = wolf + villagers + seer + witcher + guardian + idiot;
+            hunter = extras.getInt("hunter");
+            mode = extras.getBoolean("mode");
+            totalPlayers = wolf + villagers + seer + witcher + guardian + idiot + hunter;
 
             playerID = new ArrayList<>();
             for (int i = 0; i < 12; i++) {
@@ -107,6 +107,9 @@ public class SetPlayerCharacter extends AppCompatActivity {
             }
             for (int i = 0; i < idiot; i++) {
                 characterList.add("idiot");
+            }
+            for (int i = 0; i < hunter; i++) {
+                characterList.add("hunter");
             }
 
             assignedCharacterList = getRandomCharacter(characterList, totalPlayers);
@@ -176,6 +179,8 @@ public class SetPlayerCharacter extends AppCompatActivity {
         game.putExtra("witcher", witcher);
         game.putExtra("guardian", guardian);
         game.putExtra("idiot", idiot);
+        game.putExtra("hunter", hunter);
+        game.putExtra("mode", mode);
 
         startActivity(game);
     }
