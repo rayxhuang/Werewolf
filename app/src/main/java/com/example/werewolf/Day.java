@@ -19,6 +19,17 @@ import java.util.ArrayList;
 
 public class Day extends AppCompatActivity {
     private File file;
+    private int seerID;
+    private int witcherID;
+    private int guardianID;
+    private int idiotID;
+    private int hunterID;
+    private Character Idiot;
+    private Character Hunter;
+    private Boolean mode;
+    private ArrayList<Character> characterArray;
+    private Integer numPlayers;
+
     private int wolf;
     private int villagers;
     private int seer;
@@ -26,24 +37,13 @@ public class Day extends AppCompatActivity {
     private int guardian;
     private int idiot;
     private int hunter;
-    private Boolean mode;
 
-    private Integer deathID1 = 0;
-    private Integer deathID2 = 0;
+    private Integer deathID1;
+    private Integer deathID2;
 
-    private ArrayList<Integer> playerID;
-    private ArrayList<String> assignedCharacterList;
-    private Integer numPlayers;
-    private ArrayList<Boolean> alive;
     private Integer selectedPlayerID = 0;
     private Integer currentSelectedPlayerID = 0;
     private String currentCharacter = "None";
-    private Integer guardedPlayerID;
-    private Integer intentKillPlayerID;
-    private Boolean witcherHoldsAntidote;
-    private Boolean witcherHoldsPoison;
-    private Integer antidotePlayerID;
-    private Integer poisonPlayerID;
     private TextView actionLabel;
     private TextView actionLabel2;
     private Button confirmButton;
@@ -117,21 +117,36 @@ public class Day extends AppCompatActivity {
         //Sets onClickListener to assigned player card
         //Displays dead player card and make it unclickable
         for (int i = 0; i < pCollection.size(); i++){
-            if (assignedCharacterList.get(i).equals("None")){
+            Character A = characterArray.get(i);
+            if (A.getAssignedCharacter() == null){
                 makeTransparent(i);
             }
             ImageView card = pCollection.get(i);
             if (i < numPlayers) {
                 card.setOnClickListener(selectPlayer);
-                if (alive.get(i).equals(false)) {
+                if (!A.isAlive()) {
                     card.setClickable(false);
-                    updateDeadCard(i);
                 }
             }
         }
     }
 
     private void getExtras(Bundle extras){
+        mode = extras.getBoolean("mode");
+        file = (File) extras.get("file");
+        characterArray = extras.getParcelableArrayList("characters");
+        numPlayers = (Integer) extras.get("numPlayers");
+
+        seerID = extras.getInt("seerID");
+        witcherID = extras.getInt("witcherID");
+        guardianID = extras.getInt("guardianID");
+        idiotID = extras.getInt("idiotID");
+        hunterID = extras.getInt("hunterID");
+        if (idiotID != -1) { Idiot = characterArray.get(idiotID - 1); }
+        if (hunterID != -1) { Hunter = characterArray.get(hunterID - 1); }
+        deathID1 = extras.getInt("deathID1");
+        deathID2 = extras.getInt("deathID2");
+
         wolf = extras.getInt("wolf");
         villagers = extras.getInt("villagers");
         seer = extras.getInt("seer");
@@ -139,18 +154,6 @@ public class Day extends AppCompatActivity {
         guardian = extras.getInt("guardian");
         idiot = extras.getInt("idiot");
         hunter = extras.getInt("hunter");
-        mode = extras.getBoolean("mode");
-        playerID = (ArrayList<Integer>) extras.get("id");
-        assignedCharacterList = (ArrayList<String>) extras.get("characters");
-        numPlayers = (Integer) extras.get("numPlayers");
-        alive = (ArrayList<Boolean>) extras.get("alive");
-        guardedPlayerID = (Integer) extras.get("guardedPlayerID");
-        intentKillPlayerID = (Integer) extras.get("intentKillPlayerID");
-        antidotePlayerID = (Integer) extras.get("antidotePlayerID");
-        poisonPlayerID = (Integer) extras.get("poisonPlayerID");
-        witcherHoldsAntidote = (Boolean) extras.get("witcherHoldsAntidote");
-        witcherHoldsPoison = (Boolean) extras.get("witcherHoldsPoison");
-        file = (File) extras.get("file");
     }
 
     private void makeTransparent(int i) { pCollection.get(i).setImageResource(R.drawable.transparent); }
@@ -166,126 +169,11 @@ public class Day extends AppCompatActivity {
     private void makeDeadCardUnClickable() {
         for (int i = 0; i < numPlayers; i++) {
             ImageView card = pCollection.get(i);
-            if (alive.get(i).equals(false)) {
+            if (!characterArray.get(i).isAlive()) {
                 card.setClickable(false);
                 updateDeadCard(i);
             }
         }
-    }
-
-    private void judgeDeath() {
-        //Judge death(s)
-        if (intentKillPlayerID != 0) {
-            if (antidotePlayerID.equals(intentKillPlayerID)){
-                if (guardedPlayerID.equals(intentKillPlayerID)) {
-                    deathID1 = intentKillPlayerID;
-                    alive.set(deathID1 - 1 , false);
-                    updateDeadCard(deathID1 - 1);
-                }
-            } else {
-                if (!guardedPlayerID.equals(intentKillPlayerID)) {
-                    //Wolf is killing a dead player
-                    if (alive.get(intentKillPlayerID - 1)) {
-                        deathID1 = intentKillPlayerID;
-                        alive.set(deathID1 - 1 , false);
-                        updateDeadCard(deathID1 - 1);
-                    } else {
-                        deathID1 = 0;
-                    }
-                }
-            }
-        }
-        if (poisonPlayerID != 0) {
-            if (alive.get(poisonPlayerID - 1)) {
-                deathID2 = poisonPlayerID;
-                alive.set(deathID2 - 1 , false);
-                updateDeadCard(deathID2 - 1);
-                if (deathID1 == 0) {
-                    writeToFile("晚上死亡的是" + deathID2 + "号玩家\n", file);
-                    actionLabel.setText("昨天晚上死亡的是");
-                    actionLabel2.setText(deathID2 + "号玩家");
-                } else {
-                    int firstID = deathID1;
-                    int secondID = deathID2;
-                    int tempID;
-                    if (firstID > secondID) {
-                        tempID = firstID;
-                        firstID = secondID;
-                        secondID = tempID;
-                    }
-                    writeToFile("晚上死亡的是" + firstID + "号玩家\n", file);
-                    writeToFile("晚上死亡的是" + secondID + "号玩家\n", file);
-                    actionLabel.setText("昨天晚上死亡的是");
-                    actionLabel2.setText(firstID + "号玩家和" + secondID + "号玩家");
-                }
-            } else {
-                if (deathID1 == 0) {
-                    writeToFile("昨天晚上是平安夜\n", file);
-                    actionLabel.setText("昨天晚上是平安夜");
-                    actionLabel2.setText("");
-                } else {
-                    writeToFile("晚上死亡的是" + deathID1 + "号玩家\n", file);
-                    actionLabel.setText("昨天晚上死亡的是");
-                    actionLabel2.setText(deathID1 + "号玩家");
-                }
-            }
-        } else {
-            if (deathID1 == 0) {
-                actionLabel.setText("昨天晚上是平安夜");
-                actionLabel2.setText("");
-                writeToFile("昨天晚上是平安夜\n", file);
-            } else {
-                writeToFile("晚上死亡的是" + deathID1 + "号玩家\n", file);
-                actionLabel.setText("昨天晚上死亡的是");
-                actionLabel2.setText(deathID1 + "号玩家");
-            }
-        }
-
-        makeDeadCardUnClickable();
-
-        //Try to decide victory
-        new Handler().postDelayed(() -> {
-            Integer won = judgeGame(mode);
-            if (won != 0) {
-                backToGame(won);
-            } else {
-                //Vote player and handle dead hunter if any
-                //Add onClickListeners to alive players
-                for (int i = 0; i < pCollection.size(); i++){
-                    if (assignedCharacterList.get(i).equals("None")){
-                        makeTransparent(i);
-                    }
-                    ImageView card = pCollection.get(i);
-                    if (i < numPlayers) {
-                        card.setOnClickListener(selectPlayer);
-                        if (alive.get(i).equals(false)) {
-                            card.setClickable(false);
-                            updateDeadCard(i);
-                        }
-                    }
-                }
-
-                if (assignedCharacterList.contains("hunter")) {
-                    int hunterID = assignedCharacterList.indexOf("hunter") + 1;
-                    if (deathID1.equals(hunterID)) {
-                        //Hunter is killed by wolf
-                        new Handler().postDelayed(() -> {
-                            updateHunterCard(hunterID - 1);
-                            writeToFile(deathID1 + "号玩家的身份是猎人\n", file);
-                            actionLabel.setText(deathID1 + "号玩家是猎人");
-                            actionLabel2.setText("请选择你要杀死的玩家或跳过");
-                        }, 1000);
-
-                        //Enable hunter to kill
-                        new Handler().postDelayed(() -> hunter(true), 3000);
-                    } else {
-                        enableVote();
-                    }
-                } else {
-                    enableVote();
-                }
-            }
-        }, 2000);
     }
 
     private void hunter(Boolean t) {
@@ -315,7 +203,64 @@ public class Day extends AppCompatActivity {
     private final View.OnClickListener displayNightInfo = new View.OnClickListener() {
         public void onClick(View view) {
             confirmButton.setEnabled(false);
-            judgeDeath();
+            if (deathID1 != 0 && deathID2 != 0) {
+                int firstID = deathID1;
+                int secondID = deathID2;
+                int tempID;
+                if (firstID > secondID) {
+                    tempID = firstID;
+                    firstID = secondID;
+                    secondID = tempID;
+                }
+                writeToFile("晚上死亡的是" + firstID + "号玩家\n", file);
+                writeToFile("晚上死亡的是" + secondID + "号玩家\n", file);
+                actionLabel.setText("昨天晚上死亡的是");
+                actionLabel2.setText(firstID + "号玩家和" + secondID + "号玩家");
+            } else {
+                if (deathID1 == 0 && deathID2 == 0) {
+                    writeToFile("昨天晚上是平安夜\n", file);
+                    actionLabel.setText("昨天晚上是平安夜");
+                    actionLabel2.setText("");
+                } else {
+                    if (deathID1 == 0) {
+                        deathID1 = deathID2;
+                    }
+                    writeToFile("晚上死亡的是" + deathID1 + "号玩家\n", file);
+                    actionLabel.setText("昨天晚上死亡的是");
+                    actionLabel2.setText(deathID1 + "号玩家");
+                }
+            }
+            makeDeadCardUnClickable();
+
+            new Handler().postDelayed(() -> {
+                Integer won = judgeGame(mode);
+                if (won != 0) {
+                    backToGame(won);
+                } else {
+                    //Vote player and handle dead hunter if any
+                    //Add onClickListeners to alive players
+                    if (Hunter != null) {
+                        if (!Hunter.isAlive() && !deathID2.equals(hunterID)) {
+                            //Hunter is killed by wolf
+                            new Handler().postDelayed(() -> {
+                                updateHunterCard(hunterID - 1);
+                                writeToFile(hunterID + "号玩家的身份是猎人\n", file);
+                                actionLabel.setText(hunterID + "号玩家是猎人");
+                                actionLabel2.setText("请选择你要杀死的玩家或跳过");
+                            }, 1000);
+
+                            //Enable hunter to kill
+                            new Handler().postDelayed(() -> hunter(true), 3000);
+                        } else {
+                            //Hunter is poisoned or still alive
+                            enableVote();
+                        }
+                    } else {
+                        //No hunter in the game
+                        enableVote();
+                    }
+                }
+            }, 2000);
         }
     };
 
@@ -352,95 +297,60 @@ public class Day extends AppCompatActivity {
                 writeToFile("村民没有处决任何玩家\n", file);
                 actionLabel.setText("村民没有处决任何人");
                 actionLabel2.setText("");
-                new Handler().postDelayed(() -> {
-                    Integer won = judgeGame(false);
-                    if (won != 0) {
-                        backToGame(won);
-                    } else {
-                        //Goes into Night again
-                        new Handler().postDelayed(() -> {
-                            actionLabel.setText("");
-                            actionLabel2.setText("");
-                            mp.stop();
-                            mp.reset();
-                            mp.release();
-
-                            backToNight();
-                        }, 3000);
-                    }
-                }, 3000);
             } else {
                 //需要加上第二次票出白痴的情况
-                int idiotID = 0;
-                int hunterID = 0;
-                if (assignedCharacterList.contains("idiot")) {
-                    idiotID = assignedCharacterList.indexOf("idiot") + 1;
-                }
-                if (assignedCharacterList.contains("hunter")) {
-                    hunterID = assignedCharacterList.indexOf("hunter") + 1;
-                }
-
                 writeToFile("村民处决了" + selectedPlayerID + "号玩家\n", file);
                 actionLabel.setText("村民处决了" + selectedPlayerID + "号玩家");
-                if (selectedPlayerID.equals(idiotID)) {
-                    writeToFile(selectedPlayerID + "号玩家的身份是白痴！\n", file);
-                    writeToFile(selectedPlayerID + "号玩家没有死亡\n", file);
-                    actionLabel2.setText(selectedPlayerID + "号玩家的身份是白痴");
-                    updateIdiotCard(selectedPlayerID - 1);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Integer won = judgeGame(false);
-                            if (won != 0) {
-                                backToGame(won);
-                            } else {
-                                //Goes into Night again
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        actionLabel.setText("");
-                                        actionLabel2.setText("");
-                                        mp.stop();
-                                        mp.reset();
-                                        mp.release();
-
-                                        backToNight();
-                                    }
-                                }, 3000);
-                            }
+                if (Idiot != null) {
+                    if (selectedPlayerID.equals(idiotID)) {
+                        if (!Idiot.hasBeenVoted()) {
+                            writeToFile(idiotID + "号玩家的身份是白痴！\n", file);
+                            writeToFile(idiotID + "号玩家没有死亡\n", file);
+                            actionLabel2.setText(selectedPlayerID + "号玩家的身份是白痴");
+                            updateIdiotCard(selectedPlayerID - 1);
+                            Idiot.setHasBeenVoted(true);
+                        } else {
+                            writeToFile("村民处决了白痴！\n", file);
+                            writeToFile(idiotID + "号玩家死了！\n", file);
+                            actionLabel2.setText("村民处决了白痴！");
+                            updateIdiotCard(selectedPlayerID - 1);
+                            Idiot.setAlive(false);
                         }
-                    }, 3000);
-                } else if (selectedPlayerID.equals(hunterID)) {
-                    alive.set(selectedPlayerID - 1, false);
-                    writeToFile(selectedPlayerID + "号玩家死了！\n", file);
-                    writeToFile(selectedPlayerID + "号玩家的身份是猎人\n", file);
-                    actionLabel2.setText(selectedPlayerID + "号玩家的身份是猎人");
-                    updateHunterCard(selectedPlayerID - 1);
-                    hunter(false);
+                    }
+                } else if (Hunter != null) {
+                    if (selectedPlayerID.equals(hunterID)) {
+                        writeToFile(selectedPlayerID + "号玩家死了！\n", file);
+                        writeToFile(selectedPlayerID + "号玩家的身份是猎人\n", file);
+                        actionLabel2.setText(selectedPlayerID + "号玩家的身份是猎人");
+                        updateHunterCard(hunterID - 1);
+                        Hunter.setAlive(false);
+                        hunter(false);
+                    }
                 } else {
-                    alive.set(selectedPlayerID - 1, false);
+                    characterArray.get(selectedPlayerID - 1).setAlive(false);
                     writeToFile(selectedPlayerID + "号玩家死了！\n", file);
                     actionLabel2.setText("");
                     updateDeadCard(selectedPlayerID - 1);
-                    new Handler().postDelayed(() -> {
-                        Integer won = judgeGame(false);
-                        if (won != 0) {
-                            backToGame(won);
-                        } else {
-                            //Goes into Night again
-                            new Handler().postDelayed(() -> {
-                                actionLabel.setText("");
-                                actionLabel2.setText("");
-                                mp.stop();
-                                mp.reset();
-                                mp.release();
-
-                                backToNight();
-                            }, 3000);
-                        }
-                    }, 3000);
                 }
             }
+
+            new Handler().postDelayed(() -> {
+                Integer won = judgeGame(false);
+                if (won != 0) {
+                    backToGame(won);
+                } else {
+                    //Goes into Night again
+                    new Handler().postDelayed(() -> {
+                        actionLabel.setText("");
+                        actionLabel2.setText("");
+                        mp.stop();
+                        mp.reset();
+                        mp.release();
+
+                        backToNight();
+                    }, 3000);
+                }
+            }, 3000);
         }
     };
 
@@ -456,7 +366,7 @@ public class Day extends AppCompatActivity {
                 writeToFile("猎人杀死了" + selectedPlayerID + "号玩家\n", file);
                 actionLabel.setText("猎人杀死了");
                 actionLabel2.setText(selectedPlayerID + "号玩家");
-                alive.set(selectedPlayerID - 1, false);
+                characterArray.get(selectedPlayerID - 1).setAlive(false);
                 makeDeadCardUnClickable();
             }
             new Handler().postDelayed(() -> {
@@ -488,7 +398,7 @@ public class Day extends AppCompatActivity {
                 writeToFile("猎人杀死了" + selectedPlayerID + "号玩家\n", file);
                 actionLabel.setText("猎人杀死了");
                 actionLabel2.setText(selectedPlayerID + "号玩家");
-                alive.set(selectedPlayerID - 1, false);
+                characterArray.get(selectedPlayerID - 1).setAlive(false);
                 makeDeadCardUnClickable();
             }
 
@@ -520,17 +430,10 @@ public class Day extends AppCompatActivity {
         //2 stands for werewolf victory
         int aliveGod = 0, aliveVillager = 0, aliveWolf = 0;
         for (int i = 0; i < numPlayers; i++) {
-            switch (assignedCharacterList.get(i)) {
-                case "wolf":
-                    if (alive.get(i).equals(true)) {aliveWolf += 1;}
-                    break;
-                case "villager":
-                    if (alive.get(i).equals(true)) {aliveVillager += 1;}
-                    break;
-                default:
-                    if (alive.get(i).equals(true)) {aliveGod += 1;}
-                    break;
-            }
+            Character A = characterArray.get(i);
+            if (A.getAssignedCharacter().equals("村民") && A.isAlive()) { aliveVillager += 1; }
+            if (A.getAssignedCharacter().equals("狼人") && A.isAlive()) { aliveWolf += 1; }
+            if (A.getParty().equals("神") && A.isAlive()) { aliveGod += 1; }
         }
         if (all) {
             if (aliveGod + aliveVillager == 0) {return 2;}
@@ -547,10 +450,12 @@ public class Day extends AppCompatActivity {
     private void backToGame(Integer won){
         Intent game = new Intent(Day.this, Game.class);
 
-        game.putExtra("id", playerID);
-        game.putExtra("characters", assignedCharacterList);
+        game.putParcelableArrayListExtra("characters", characterArray);
+        game.putExtra("mode", mode);
         game.putExtra("finished", true);
         game.putExtra("won", won);
+        game.putExtra("numPlayers", numPlayers);
+
         game.putExtra("wolf", wolf);
         game.putExtra("villagers", villagers);
         game.putExtra("seer", seer);
@@ -558,23 +463,30 @@ public class Day extends AppCompatActivity {
         game.putExtra("guardian", guardian);
         game.putExtra("idiot", idiot);
         game.putExtra("hunter", hunter);
-        game.putExtra("mode", mode);
+
+        game.putExtra("seerID", seerID);
+        game.putExtra("witcherID", witcherID);
+        game.putExtra("guardianID", guardianID);
+        game.putExtra("idiotID", idiotID);
+        game.putExtra("hunterID", hunterID);
 
         startActivity(game);
     }
 
     private void backToNight() {
         Intent night = new Intent(Day.this, Night.class);
-        night.putExtra("id", playerID);
-        night.putExtra("characters", assignedCharacterList);
-        night.putExtra("alive",alive);
+
+        night.putParcelableArrayListExtra("characters", characterArray);
         night.putExtra("numPlayers", numPlayers);
-        night.putExtra("guardedPlayerID", guardedPlayerID);
-        night.putExtra("intentKillPlayerID", 0);
-        night.putExtra("antidotePlayerID", antidotePlayerID);
-        night.putExtra("poisonPlayerID", poisonPlayerID);
-        night.putExtra("witcherHoldsAntidote", witcherHoldsAntidote);
-        night.putExtra("witcherHoldsPoison", witcherHoldsPoison);
+        night.putExtra("mode", mode);
+        night.putExtra("file", file);
+
+        night.putExtra("seerID", seerID);
+        night.putExtra("witcherID", witcherID);
+        night.putExtra("guardianID", guardianID);
+        night.putExtra("idiotID", idiotID);
+        night.putExtra("hunterID", hunterID);
+
         night.putExtra("wolf", wolf);
         night.putExtra("villagers", villagers);
         night.putExtra("seer", seer);
@@ -582,8 +494,7 @@ public class Day extends AppCompatActivity {
         night.putExtra("guardian", guardian);
         night.putExtra("idiot", idiot);
         night.putExtra("hunter", hunter);
-        night.putExtra("mode", mode);
-        night.putExtra("file", file);
+
         startActivity(night);
     }
 

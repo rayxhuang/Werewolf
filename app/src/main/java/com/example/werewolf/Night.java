@@ -22,6 +22,18 @@ import static com.example.werewolf.R.string.killTextLabel;
 
 public class Night extends AppCompatActivity {
     private File file;
+    private int seerID;
+    private int witcherID;
+    private int guardianID;
+    private int idiotID;
+    private int hunterID;
+    private Character Seer;
+    private Character Witcher;
+    private Character Guardian;
+    private Boolean mode;
+    private ArrayList<Character> characterArray;
+    private Integer numPlayers;
+
     private int wolf;
     private int villagers;
     private int seer;
@@ -29,20 +41,14 @@ public class Night extends AppCompatActivity {
     private int guardian;
     private int idiot;
     private int hunter;
-    private Boolean mode;
-    private ArrayList<Integer> playerID;
-    private ArrayList<String> assignedCharacterList;
-    private Integer numPlayers;
-    private ArrayList<Boolean> alive;
+
     private String currentCharacter = "None";
     private Integer selectedPlayerID = 0;
     private Integer currentSelectedPlayerID = 0;
-    private Integer guardedPlayerID;
-    private Integer intentKillPlayerID;
-    private Boolean witcherHoldsAntidote;
-    private Boolean witcherHoldsPoison;
-    private Integer antidotePlayerID;
-    private Integer poisonPlayerID;
+    private Integer intentKillPlayerID = 0;
+    private Integer deathID1 = 0;
+    private Integer deathID2 = 0;
+
     private TextView actionLabel;
     private Button confirmButton;
     private Button witcherSaveButton;
@@ -77,21 +83,23 @@ public class Night extends AppCompatActivity {
             } else {
                 actionLabel.setText("你选择了" + selectedPlayerID + "号玩家");
                 if (currentCharacter.equals("Witcher")){
-                    if (witcherHoldsAntidote) {
+                    if (Witcher.isHoldingAntidote()) {
                         if (selectedPlayerID.equals(intentKillPlayerID)) {
-                            if (selectedPlayerID - 1 != assignedCharacterList.indexOf("witcher")) {
+                            if (selectedPlayerID != witcherID) {
+                                //Witcher cannot save herself
                                 witcherSaveButton.setEnabled(true);
                             }
                         } else {
                             witcherSaveButton.setEnabled(false);
                         }
                     }
-                    if (witcherHoldsPoison) {
+                    if (Witcher.isHoldingPoison()) {
                         witcherKillButton.setEnabled(true);
                     }
                 }
                 if (currentCharacter.equals("Guardian")){
-                    if (guardedPlayerID.equals(selectedPlayerID)) {
+                    if (selectedPlayerID == Guardian.getGuardedPlayerID()) {
+                        //Guardian cannot guard the same player two consecutive nights
                         actionLabel.setText("你不能连续两晚守护同一玩家");
                         selectedPlayerID = 0;
                         confirmButton.setText("跳过");
@@ -111,7 +119,7 @@ public class Night extends AppCompatActivity {
 
     private final View.OnClickListener confirmGuard = new View.OnClickListener() {
         public void onClick(View view) {
-            guardedPlayerID = selectedPlayerID;
+            Guardian.setGuardedPlayerID(selectedPlayerID);
             confirmButton.setEnabled(false);
             hideRevealed();
             makeAllClickable(false);
@@ -119,8 +127,8 @@ public class Night extends AppCompatActivity {
                 actionLabel.setText("你没有守护任何玩家");
                 writeToFile("守卫没有守护任何玩家\n", file);
             } else {
-                actionLabel.setText("你守护了" + guardedPlayerID + "号玩家");
-                writeToFile("守卫守护了" + guardedPlayerID + "号玩家\n", file);
+                actionLabel.setText("你守护了" + selectedPlayerID + "号玩家");
+                writeToFile("守卫守护了" + selectedPlayerID + "号玩家\n", file);
             }
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
@@ -164,24 +172,41 @@ public class Night extends AppCompatActivity {
                 mp.start();
                 //Hide wolf card
                 hideRevealed();
-                if (!guardedPlayerID.equals(intentKillPlayerID)) {
-                    Integer won = judgeGame(mode);
-                    if (won == 2){
-                        mp.release();
-                        Intent game = new Intent(Night.this, Game.class);
+                if (guardianID != -1) {
+                    if (Guardian.getGuardedPlayerID() != (intentKillPlayerID)) {
+                        Integer won = judgeGame(mode);
+                        if (won == 2) {
+                            mp.release();
+                            Intent game = new Intent(Night.this, Game.class);
 
-                        game.putExtra("id", playerID);
-                        game.putExtra("characters", assignedCharacterList);
-                        game.putExtra("finished", true);
-                        game.putExtra("won", won);
-                        game.putExtra("wolf", wolf);
-                        game.putExtra("villagers", villagers);
-                        game.putExtra("seer", seer);
-                        game.putExtra("witcher", witcher);
-                        game.putExtra("guardian", guardian);
-                        game.putExtra("idiot", idiot);
+                            game.putExtra("characters", characterArray);
+                            game.putExtra("mode", mode);
+                            game.putExtra("finished", true);
+                            game.putExtra("won", won);
+                            game.putExtra("numPlayers", numPlayers);
 
-                        startActivity(game);
+                            game.putExtra("wolf", wolf);
+                            game.putExtra("villagers", villagers);
+                            game.putExtra("seer", seer);
+                            game.putExtra("witcher", witcher);
+                            game.putExtra("guardian", guardian);
+                            game.putExtra("idiot", idiot);
+                            game.putExtra("hunter", hunter);
+
+                            game.putExtra("seerID", seerID);
+                            game.putExtra("witcherID", witcherID);
+                            game.putExtra("guardianID", guardianID);
+                            game.putExtra("idiotID", idiotID);
+                            game.putExtra("hunterID", hunterID);
+
+                            startActivity(game);
+                        } else {
+                            //Setup seer
+                            new Handler().postDelayed(() -> {
+                                makeAllClickable(true);
+                                setupSeer();
+                            }, 9000);
+                        }
                     } else {
                         //Setup seer
                         new Handler().postDelayed(() -> {
@@ -189,12 +214,6 @@ public class Night extends AppCompatActivity {
                             setupSeer();
                         }, 9000);
                     }
-                } else {
-                    //Setup seer
-                    new Handler().postDelayed(() -> {
-                        makeAllClickable(true);
-                        setupSeer();
-                    }, 9000);
                 }
             }, 3000);
         }
@@ -208,14 +227,14 @@ public class Night extends AppCompatActivity {
                 mp.stop();
                 mp.reset();
             }
+            Witcher.setSavedPlayerID(intentKillPlayerID);
+            Witcher.setHoldingAntidote(false);
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
-            witcherHoldsAntidote = false;
             witcherSaveButton.setEnabled(false);
             witcherKillButton.setEnabled(false);
             confirmButton.setEnabled(false);
             makeAllClickable(false);
-            antidotePlayerID = intentKillPlayerID;
             finishWitcher();
         }
     };
@@ -246,13 +265,13 @@ public class Night extends AppCompatActivity {
                 mp.stop();
                 mp.reset();
             }
-            poisonPlayerID = selectedPlayerID;
+            Witcher.setPoisonedPlayerID(selectedPlayerID);
+            Witcher.setHoldingPoison(false);
             currentSelectedPlayerID = 0;
             selectedPlayerID = 0;
-            witcherHoldsPoison = false;
-            confirmButton.setEnabled(false);
             witcherSaveButton.setEnabled(false);
             witcherKillButton.setEnabled(false);
+            confirmButton.setEnabled(false);
             makeAllClickable(false);
             finishWitcher();
         }
@@ -264,10 +283,10 @@ public class Night extends AppCompatActivity {
             hideRevealed();
             makeAllClickable(false);
             if (selectedPlayerID != 0) {
-                String character = assignedCharacterList.get(selectedPlayerID - 1);
+                String character = characterArray.get(selectedPlayerID - 1).getParty();
                 boolean goodCharacter = true;
                 String characterLabel = "好人";
-                if ("wolf".equals(character)) {
+                if ("狼".equals(character)) {
                     goodCharacter = false;
                     characterLabel = "狼人";
                 }
@@ -292,12 +311,10 @@ public class Night extends AppCompatActivity {
                 mp.start();
             }, 3000);
 
-            if (assignedCharacterList.contains("witcher")) {
+            if (witcherID != -1) {
                 new Handler().postDelayed(() -> {
-                    if (assignedCharacterList.contains("witcher")){
-                        makeAllClickable(true);
-                        setupWitcher();
-                    }
+                    makeAllClickable(true);
+                    setupWitcher();
                     //
                 }, 12000);
             } else {
@@ -334,7 +351,7 @@ public class Night extends AppCompatActivity {
         //Setup different characters
         new Handler().postDelayed(() -> {
             makeCardVisible();
-            if (assignedCharacterList.contains("guardian")){
+            if (guardianID != -1){
                 setupGuardian();
             } else {
                 setupWolf();
@@ -342,7 +359,7 @@ public class Night extends AppCompatActivity {
         }, 7000);
     }
 
-    //This function initialises Night.class
+//    This function initialises Night.class
     private void init() {
         actionLabel = findViewById(R.id.actionLabel);
         actionLabel.setText("天黑请闭眼");
@@ -383,14 +400,15 @@ public class Night extends AppCompatActivity {
         //Sets onClickListener to assigned player card
         //Displays dead player card and make it unclickable
         for (int i = 0; i < pCollection.size(); i++){
-            if (assignedCharacterList.get(i).equals("None")){
+            Character A = characterArray.get(i);
+            if (A.getAssignedCharacter() == null){
                 makeTransparent(i);
             }
             ImageView card = pCollection.get(i);
             card.setVisibility(View.GONE);
             if (i < numPlayers) {
                 card.setOnClickListener(selectPlayer);
-                if (alive.get(i).equals(false)) {
+                if (!A.isAlive()) {
                     card.setClickable(false);
                     updateDeadCard(i);
                 }
@@ -414,6 +432,20 @@ public class Night extends AppCompatActivity {
 
     //This function gets all the extras and set them to the field
     private void getExtras(Bundle extras){
+        mode = extras.getBoolean("mode");
+        file = (File) extras.get("file");
+        characterArray = (ArrayList<Character>) extras.get("characters");
+        numPlayers = extras.getInt("numPlayers");
+
+        seerID = extras.getInt("seerID");
+        witcherID = extras.getInt("witcherID");
+        guardianID = extras.getInt("guardianID");
+        idiotID = extras.getInt("idiotID");
+        hunterID = extras.getInt("hunterID");
+        if (seerID != -1) { Seer = characterArray.get(seerID - 1); }
+        if (witcherID != -1) { Witcher = characterArray.get(witcherID - 1); }
+        if (guardianID != -1) { Guardian = characterArray.get(guardianID - 1); }
+
         wolf = extras.getInt("wolf");
         villagers = extras.getInt("villagers");
         seer = extras.getInt("seer");
@@ -421,18 +453,6 @@ public class Night extends AppCompatActivity {
         guardian = extras.getInt("guardian");
         idiot = extras.getInt("idiot");
         hunter = extras.getInt("hunter");
-        mode = extras.getBoolean("mode");
-        playerID = (ArrayList<Integer>) extras.get("id");
-        assignedCharacterList = (ArrayList<String>) extras.get("characters");
-        numPlayers = (Integer) extras.get("numPlayers");
-        alive = (ArrayList<Boolean>) extras.get("alive");
-        guardedPlayerID = (Integer) extras.get("guardedPlayerID");
-        intentKillPlayerID = (Integer) extras.get("intentKillPlayerID");
-        antidotePlayerID = (Integer) extras.get("antidotePlayerID");
-        poisonPlayerID = (Integer) extras.get("poisonPlayerID");
-        witcherHoldsAntidote = (Boolean) extras.get("witcherHoldsAntidote");
-        witcherHoldsPoison = (Boolean) extras.get("witcherHoldsPoison");
-        file = (File) extras.get("file");
     }
 
     //This function makes all card visible
@@ -458,7 +478,7 @@ public class Night extends AppCompatActivity {
     private void makeDeadCardUnClickable() {
         for (int i = 0; i < numPlayers; i++) {
             ImageView card = pCollection.get(i);
-            if (alive.get(i).equals(false)) {
+            if (!characterArray.get(i).isAlive()) {
                 card.setClickable(false);
                 updateDeadCard(i);
             }
@@ -493,7 +513,7 @@ public class Night extends AppCompatActivity {
 
     private void showGuardian() {
         for (int i = 0; i < numPlayers; i++) {
-            if (assignedCharacterList.get(i).equals("guardian")) {
+            if (characterArray.get(i).getAssignedCharacter().equals("守卫")) {
                 pCollection.get(i).setImageResource(R.drawable.guardian);
             }
         }
@@ -519,9 +539,10 @@ public class Night extends AppCompatActivity {
     //This function replaces player's card with wolf if his assigned character is wolf
     private void showWolfMate() {
         for (int i = 0; i < numPlayers; i++) {
-            if (assignedCharacterList.get(i).equals("wolf")) {
+            Character A = characterArray.get(i);
+            if (A.getAssignedCharacter().equals("狼人")) {
                 ImageView card = pCollection.get(i);
-                if (alive.get(i)) {
+                if (A.isAlive()) {
                     card.setImageResource(R.drawable.wolf);
                 } else {
                     card.setImageResource(R.drawable.wolf_dead);
@@ -546,7 +567,7 @@ public class Night extends AppCompatActivity {
 
     private void showSeer() {
         for (int i = 0; i < numPlayers; i++) {
-            if (assignedCharacterList.get(i).equals("seer")) {
+            if (characterArray.get(i).getAssignedCharacter().equals("预言家")) {
                 pCollection.get(i).setImageResource(R.drawable.seer);
             }
         }
@@ -575,14 +596,14 @@ public class Night extends AppCompatActivity {
         mp = MediaPlayer.create(Night.this, R.raw.audio_witcher_start);
         mp.setOnCompletionListener(prepareForNext);
         mp.start();
-        if (witcherHoldsAntidote) {
+        if (Witcher.isHoldingAntidote()) {
             showIntentKill(intentKillPlayerID);
         }
     }
 
     private void showWitcher() {
         for (int i = 0; i < numPlayers; i++) {
-            if (assignedCharacterList.get(i).equals("witcher")) {
+            if (characterArray.get(i).getAssignedCharacter().equals("女巫")) {
                 pCollection.get(i).setImageResource(R.drawable.witcher);
             }
         }
@@ -612,18 +633,25 @@ public class Night extends AppCompatActivity {
 
     private void finishNight(){
         mp.release();
-        Toast.makeText(Night.this, "天亮了...", Toast.LENGTH_SHORT).show();
+
+        judgeDeath();
+
         Intent day = new Intent(Night.this, Day.class);
-        day.putExtra("id", playerID);
-        day.putExtra("characters", assignedCharacterList);
-        day.putExtra("alive",alive);
+
+        day.putParcelableArrayListExtra("characters", characterArray);
         day.putExtra("numPlayers", numPlayers);
-        day.putExtra("guardedPlayerID", guardedPlayerID);
-        day.putExtra("intentKillPlayerID", intentKillPlayerID);
-        day.putExtra("antidotePlayerID", antidotePlayerID);
-        day.putExtra("poisonPlayerID", poisonPlayerID);
-        day.putExtra("witcherHoldsAntidote", witcherHoldsAntidote);
-        day.putExtra("witcherHoldsPoison", witcherHoldsPoison);
+        day.putExtra("mode", mode);
+        day.putExtra("file", file);
+
+        day.putExtra("deathID1", deathID1);
+        day.putExtra("deathID2", deathID2);
+
+        day.putExtra("seerID", seerID);
+        day.putExtra("witcherID", witcherID);
+        day.putExtra("guardianID", guardianID);
+        day.putExtra("idiotID", idiotID);
+        day.putExtra("hunterID", hunterID);
+
         day.putExtra("wolf", wolf);
         day.putExtra("villagers", villagers);
         day.putExtra("seer", seer);
@@ -631,29 +659,25 @@ public class Night extends AppCompatActivity {
         day.putExtra("guardian", guardian);
         day.putExtra("idiot", idiot);
         day.putExtra("hunter", hunter);
-        day.putExtra("mode", mode);
-        day.putExtra("file", file);
+
         startActivity(day);
     }
 
     private Integer judgeGame(Boolean all) {
         //0 stands for undecided victory
         //2 stands for werewolf victory
-        if (assignedCharacterList.contains("witcher") && witcherHoldsAntidote.equals(true)) {return 0;}
-        ArrayList<Boolean> intentAlive = new ArrayList<>(alive);
-        intentAlive.set(intentKillPlayerID - 1, false);
+        if (!characterArray.get(intentKillPlayerID - 1).isAlive()) { return 0; }
+        if (witcherID != -1) {
+            if (Witcher.isHoldingAntidote()) {
+                return 0;
+            }
+        }
+        characterArray.get(intentKillPlayerID - 1).setAlive(false);
         int aliveGod = 0, aliveVillager = 0;
         for (int i = 0; i < numPlayers; i++) {
-            switch (assignedCharacterList.get(i)) {
-                case "wolf":
-                    break;
-                case "villager":
-                    if (intentAlive.get(i).equals(true)) {aliveVillager += 1;}
-                    break;
-                default:
-                    if (intentAlive.get(i).equals(true)) {aliveGod += 1;}
-                    break;
-            }
+            Character A = characterArray.get(i);
+            if (A.getAssignedCharacter().equals("村民") && A.isAlive()) { aliveVillager += 1; }
+            if (A.getParty().equals("神") && A.isAlive()) { aliveGod += 1; }
         }
         if (all) {
             if (aliveGod + aliveVillager == 0) {return 2;}
@@ -662,7 +686,40 @@ public class Night extends AppCompatActivity {
             if (aliveGod == 0) {return 2;}
         }
         //Undecided
+        characterArray.get(intentKillPlayerID - 1).setAlive(true);
         return 0;
+    }
+
+    private void judgeDeath() {
+        //Check if wolf managed to kill
+        Character A = characterArray.get(intentKillPlayerID - 1);
+        if (A.isAlive()) {
+            if (Witcher != null) {
+                if (Witcher.getSavedPlayerID() == intentKillPlayerID) {
+                    if (Guardian != null) {
+                        if (Guardian.getGuardedPlayerID() == intentKillPlayerID) {
+                            A.setAlive(false);
+                            deathID1 = intentKillPlayerID;
+                        }
+                    }
+                }
+            } else if (Guardian != null) {
+                if (Guardian.getGuardedPlayerID() != intentKillPlayerID) {
+                    A.setAlive(false);
+                    deathID1 = intentKillPlayerID;
+                }
+            }
+        }
+
+        //Check if witcher used poison
+        if (Witcher != null) {
+            int poisonedPlayerID = Witcher.getPoisonedPlayerID();
+            if (poisonedPlayerID != 0) {
+                Character B = characterArray.get(poisonedPlayerID - 1);
+                B.setAlive(false);
+                deathID2 = poisonedPlayerID;
+            }
+        }
     }
 
     private void writeToFile(String data, File file) {

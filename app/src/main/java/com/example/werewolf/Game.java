@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,25 +22,17 @@ import java.util.ArrayList;
 
 public class Game extends AppCompatActivity {
     private MediaPlayer mp;
-    private final MediaPlayer.OnCompletionListener complete = new MediaPlayer.OnCompletionListener() {
-        @Override
-        public void onCompletion(MediaPlayer mp) {
-            mp.stop();
-            mp.reset();
-            mp.release();
-            mp = null;
-        }
+    private final MediaPlayer.OnCompletionListener complete = mp -> {
+        mp.stop();
+        mp.reset();
+        mp.release();
     };
 
-    private ArrayList<Integer> playerID;
-    private ArrayList<String> assignedCharacterList;
-    private Integer numPlayer;
-    private ArrayList<Boolean> alive;
+    private ArrayList<Character> characterArray;
+    private Integer numPlayers;
     private Boolean finished;
     private Integer won;
-
-    private TextView text1, logText;
-    private Button bt1, bt2;
+    private Boolean mode;
 
     private int wolf;
     private int villagers;
@@ -48,7 +41,15 @@ public class Game extends AppCompatActivity {
     private int guardian;
     private int idiot;
     private int hunter;
-    private Boolean mode;
+
+    private int seerID;
+    private int witcherID;
+    private int guardianID;
+    private int idiotID;
+    private int hunterID;
+
+    private TextView text1, logText;
+    private Button bt1, bt2;
 
     private View.OnClickListener startAgain = new View.OnClickListener() {
         public void onClick(View view) {
@@ -140,31 +141,7 @@ public class Game extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            logText = findViewById(R.id.logText);
-
-            text1 = findViewById(R.id.textView);
-            bt1 = findViewById(R.id.button);
-            bt2 = findViewById(R.id.button2);
-            text1.setVisibility(View.GONE);
-            bt1.setVisibility(View.GONE);
-            bt1.setEnabled(false);
-            bt2.setVisibility(View.GONE);
-            bt2.setEnabled(false);
-
-            playerID = (ArrayList<Integer>) getIntent().getSerializableExtra("id");
-            assignedCharacterList = (ArrayList<String>) getIntent().getSerializableExtra("characters");
-            numPlayer = assignedCharacterList.size();
-            alive = new ArrayList<Boolean>();
-            finished = (Boolean) extras.get("finished");
-            won = (Integer) extras.get("won");
-            wolf = extras.getInt("wolf");
-            villagers = extras.getInt("villagers");
-            seer = extras.getInt("seer");
-            witcher = extras.getInt("witcher");
-            guardian = extras.getInt("guardian");
-            idiot = extras.getInt("idiot");
-            hunter = extras.getInt("hunter");
-            mode = extras.getBoolean("mode");
+            init(extras);
 
             if (finished) {
                 logText.setVisibility(View.VISIBLE);
@@ -201,28 +178,24 @@ public class Game extends AppCompatActivity {
                 finally {
                     File file2 = new File(getFilesDir(), "log.txt");
                     writeToFile("开始游戏\n", file2);
-                    for (int i = 0; i < assignedCharacterList.size(); i++){
-                        int j = i + 1;
-                        writeToFile(j + "号玩家的身份是: " + assignedCharacterList.get(i) + "\n", file2);
-                        alive.add(true);
-                    }
-                    int extraPlayers = 12 - assignedCharacterList.size();
-                    for (int i = 0; i < extraPlayers; i++){
-                        alive.add(false);
-                        assignedCharacterList.add("None");
+                    for (int i = 0; i < characterArray.size(); i++){
+                        Character A = characterArray.get(i);
+                        writeToFile( A.getID() + "号玩家的身份是: " + A.getAssignedCharacter() + "\n", file2);
                     }
 
                     Intent night = new Intent(Game.this, Night.class);
-                    night.putExtra("id", playerID);
-                    night.putExtra("characters", assignedCharacterList);
-                    night.putExtra("alive", alive);
-                    night.putExtra("numPlayers", numPlayer);
-                    night.putExtra("guardedPlayerID", 0);
-                    night.putExtra("intentKillPlayerID", 0);
-                    night.putExtra("antidotePlayerID", 0);
-                    night.putExtra("poisonPlayerID", 0);
-                    night.putExtra("witcherHoldsAntidote", true);
-                    night.putExtra("witcherHoldsPoison", true);
+
+                    night.putExtra("characters", characterArray);
+                    night.putExtra("numPlayers", numPlayers);
+                    night.putExtra("mode", mode);
+                    night.putExtra("file", file2);
+
+                    night.putExtra("seerID", seerID);
+                    night.putExtra("witcherID", witcherID);
+                    night.putExtra("guardianID", guardianID);
+                    night.putExtra("idiotID", idiotID);
+                    night.putExtra("hunterID", hunterID);
+
                     night.putExtra("wolf", wolf);
                     night.putExtra("villagers", villagers);
                     night.putExtra("seer", seer);
@@ -230,11 +203,42 @@ public class Game extends AppCompatActivity {
                     night.putExtra("guardian", guardian);
                     night.putExtra("idiot", idiot);
                     night.putExtra("hunter", hunter);
-                    night.putExtra("mode", mode);
-                    night.putExtra("file", file2);
+
                     startActivity(night);
                 }
             }
         }
+    }
+
+    private void init(Bundle extras) {
+        logText = findViewById(R.id.logText);
+        text1 = findViewById(R.id.textView);
+        bt1 = findViewById(R.id.button);
+        bt2 = findViewById(R.id.button2);
+        text1.setVisibility(View.GONE);
+        bt1.setVisibility(View.GONE);
+        bt1.setEnabled(false);
+        bt2.setVisibility(View.GONE);
+        bt2.setEnabled(false);
+
+        characterArray = (ArrayList<Character>) extras.get("characters");
+        mode = extras.getBoolean("mode");
+        numPlayers = extras.getInt("numPlayers");
+        finished = extras.getBoolean("finished");
+        won = extras.getInt("won");
+
+        wolf = extras.getInt("wolf");
+        villagers = extras.getInt("villagers");
+        seer = extras.getInt("seer");
+        witcher = extras.getInt("witcher");
+        guardian = extras.getInt("guardian");
+        idiot = extras.getInt("idiot");
+        hunter = extras.getInt("hunter");
+
+        seerID = extras.getInt("seerID");
+        witcherID = extras.getInt("witcherID");
+        guardianID = extras.getInt("guardianID");
+        idiotID = extras.getInt("idiotID");
+        hunterID = extras.getInt("hunterID");
     }
 }
